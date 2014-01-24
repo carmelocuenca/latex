@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>lstcustom.sty - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body class="file">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./doc/created_rid.html">created.rid</a>
+  
+    <li class="file"><a href="./lstcustom_sty.html">lstcustom.sty</a>
+  
+    <li class="file"><a href="./lstcustom_sty_backup.html">lstcustom.sty.backup</a>
+  
+    <li class="file"><a href="./lstcustom_sty~.html">lstcustom.sty~</a>
+  
+    <li class="file"><a href="./ruby_acn.html">ruby.acn</a>
+  
+    <li class="file"><a href="./ruby_aux.html">ruby.aux</a>
+  
+    <li class="file"><a href="./ruby_glo.html">ruby.glo</a>
+  
+    <li class="file"><a href="./ruby_glsdefs.html">ruby.glsdefs</a>
+  
+    <li class="file"><a href="./ruby_log.html">ruby.log</a>
+  
+    <li class="file"><a href="./ruby_nav.html">ruby.nav</a>
+  
+    <li class="file"><a href="./ruby_out.html">ruby.out</a>
+  
+    <li class="file"><a href="./ruby_snm.html">ruby.snm</a>
+  
+    <li class="file"><a href="./ruby_tex.html">ruby.tex</a>
+  
+    <li class="file"><a href="./ruby_tex_backup.html">ruby.tex.backup</a>
+  
+    <li class="file"><a href="./ruby_tex~.html">ruby.tex~</a>
+  
+    <li class="file"><a href="./ruby_toc.html">ruby.toc</a>
+  
+    <li class="file"><a href="./ruby_vrb.html">ruby.vrb</a>
+  
+    <li class="file"><a href="./ruby_xdy.html">ruby.xdy</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./A.html">A</a>
+  
+    <li><a href="./B.html">B</a>
+  
+    <li><a href="./Example.html">Example</a>
+  
+    <li><a href="./Knowledge.html">Knowledge</a>
+  
+    <li><a href="./Object.html">Object</a>
+  
+    <li><a href="./Room.html">Room</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation" class="description">
+  
+<p>usepackage{color} usepackage{MnSymbol}  % extension, if, then, else,
+switch, Void, Boolean, Integer, Real, String, let</p>
+
+<p>%definecolor{green}{rgb}{0.0,1.0,0.0} lstdefinelanguage{shell} {</p>
+
+<pre>alsodigit={&gt;},
+basicstyle=\scriptsize\lstfontfamily,
+emphstyle=\color{red}\bfseries, 
+keywordstyle=\color{darkviolet}\bfseries,
+commentstyle=\color{darkgreen},
+stringstyle=\color{darkblue},
+numberstyle=\color{darkgrey}\lstfontfamily,
+emphstyle=\color{red},
+morecomment=[s][\color{lightblue}]{   }{  },</pre>
+
+<p>%  columns=fullflexible, %spaceflexible, %flexible, fullflexible</p>
+
+<p>%  escapeinside=`&#39;, %  escapechar=@,</p>
+
+<pre>showstringspaces=false,</pre>
+
+<p>% numbers=left</p>
+
+<pre>breaklines=true,
+morekeywords={cd, ls, mkdir},
+backgroundcolor=\color{lstbackgroundshellcolor},
+%keywordstyle=\color{green}
+literate={\$}{{\textcolor{blue}{\$}}}1,</pre>
+
+<p>}</p>
+
+<p>lstdefinelanguage{KLP} {morekeywords={</p>
+
+<pre>  ADD, ADDI, AND,
+  DIV, DIVI, DONE, 
+  EQ,
+  GOTO,
+  IADD, IAND, IDIV, IEQ, IGE, IGT, ILE, ILT, INITC, INITV, INPUT, 
+  ICMOV, IRMOV, ISUB, IVMOV, IOR, IXOR, 
+  IMUL,
+  JF, JMP, JNZ, JT, JZ,
+  LOCAL,
+  MUL, MULI,
+  NEQ,
+  OUTPUT,
+  PRIO,
+  RRMOV, 
+  SETCLK, SETPC,
+  SUB, SUBI,
+  VVMOV,
+  XOR
+},
+morecomment=[l]{//},
+morecomment=[l]{\#},
+morecomment=[s]{  }{  },
+morecomment=[l]{\%},
+morestring=[b]&quot;,</pre>
+
+<p>}</p>
+
+<p>newcommand<a href="http://1">lstfontfamily}{ttfamily}
+%newcommand{lstfontfamily}{sffamily} % Adapt to schneider
+newcommand{textlst</a>{mathtt{#1}}
+lstdefinestyle{tiny}{basicstyle=tinylstfontfamily}
+lstdefinestyle{scriptsize}{basicstyle=scriptsizelstfontfamily}
+lstdefinestyle{footnotesize}{basicstyle=footnotesizelstfontfamily}
+lstdefinestyle{small}{basicstyle=smalllstfontfamily}
+lstdefinestyle{normalsize}{basicstyle=normalsizelstfontfamily}
+lstdefinestyle{large}{basicstyle=lstfontfamily}</p>
+
+<p>lstdefinestyle{monitor}{morekeywords={monitor, export}}
+lstdefinestyle{ConcPascal}{language=Pascal,style=monitor}</p>
+
+<p>% To make this accessible to Emacs/AUCTeX (C-c C-f C-o), % add something
+like this to TeX-mode-hook: %  (setq LaTeX-font-list %       (append
+&#39;((?<a href="http://1">^O} “\codefont{” “}”)) %              
+LaTeX-font-list)) %newcommand{codefont</a>{{lstfontfamily #1}}
+newlength{lstframexleftmargin} setlength{lstframexleftmargin}{1mm}</p>
+
+<p>% rulesepcolor and backgroundcolor are set in
+beamercustom{presentation|handout}.sty lstdefinestyle{mydefault}{</p>
+
+<pre>style=scriptsize,
+emphstyle=\color{red},
+framexleftmargin=\lstframexleftmargin, 
+frame=shadowbox, 
+keywordstyle=\structure,
+commentstyle=\itshape,
+columns=flexible,            % Columns not rigid - gives nicer spacing 
+gobble=4,                    % Gobble first 4 characters of each line
+escapeinside=`&#39;,
+escapechar=@,
+lineskip=+0.2ex,
+rulesepcolor=\color{lstrulesepcolor},
+% WARNING: For some reason, the settin of backgroundcolor must take
+% place at the very end!!! 
+backgroundcolor=\color{lstbackgroundprogcolor},</pre>
+
+<p>}</p>
+
+<p>definecolor{darkviolet}{rgb}{0.5,0,0.4}
+definecolor{darkgreen}{rgb}{0,0.4,0.2} 
+definecolor{darkblue}{rgb}{0.1,0.1,0.9}
+definecolor{darkgrey}{rgb}{0.5,0.5,0.5}
+definecolor{lightblue}{rgb}{0.4,0.4,1}</p>
+
+<p>lstdefinestyle{eclipse}{</p>
+
+<pre>basicstyle=\scriptsize\lstfontfamily,
+emphstyle=\color{red}\bfseries, 
+keywordstyle=\color{darkviolet}\bfseries,
+commentstyle=\color{darkgreen},
+stringstyle=\color{darkblue},
+numberstyle=\color{darkgrey}\lstfontfamily,
+emphstyle=\color{red},
+  % get also javadoc style comments
+morecomment=[s][\color{lightblue}]{/**}{*/},
+ %columns=fullflexible, %spaceflexible, %flexible, fullflexible</pre>
+
+<p>%  escapeinside=`&#39;, %  escapechar=@,</p>
+
+<pre>showstringspaces=false,
+numbers=left,
+upquote=true,
+morekeywords={new, private},
+breaklines=true,
+backgroundcolor=\color{lstbackgroundshellcolor},
+prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\rhookswarrow}},
+postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\rcurvearrowse\space}},
+breaklines=true, breakatwhitespace=true,
+numbers=left, numberstyle=\scriptsize</pre>
+
+<p>}</p>
+
+<p>lstdefinestyle{black}{</p>
+
+<pre>basicstyle=\small\lstfontfamily,
+numbers=left,
+columns=fullflexible,
+breaklines=true,
+mathescape=true,
+escapechar=\#,
+tabsize=4,
+frame=lines,
+showstringspaces=false</pre>
+
+<p>}</p>
+
+<p>% use proper tt font that supports bold printing, e.g. by %
+usepackage{courier} lstdefinestyle{seminar}{</p>
+
+<pre>basicstyle=\small\ttfamily,
+numbers=left,
+breaklines=true,
+mathescape=true,
+escapechar=\#,
+tabsize=4,
+showstringspaces=false</pre>
+
+<p>}</p>
+
+</div>
+
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.0.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

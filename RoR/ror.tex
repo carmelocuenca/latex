@@ -1,0 +1,458 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{hyperref}
+%\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{multirow}
+
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstloadlanguages{Ruby}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{amsmath}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+
+\newcommand{\comment}[2]{#2}
+
+\newcommand{\commandinline}[1]{\lstinline[basicstyle=\small\lstfontfamily]{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+\graphicspath{ {./images/} }
+
+\title[RoR]{Developing Cloud Applications}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{images/logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\selectlanguage{british}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  \tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  %\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{css}{CSS}{cascading style sheets}
+\newacronym{ebs}{EBS}{Elastic Block Storage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Up and Running}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ruby Version Manager, Ruby and Ruby on Rails}
+\begin{frame}[fragile]
+\frametitle{Ruby Version Manager, Ruby}
+\begin{columns}
+\column{ 0.15 \textwidth}
+\href{https://rvm.io/}{\includegraphics[width = 1.0 \textwidth]{rvm.eps}}
+\url{https://rvm.io/}
+\column{ 0.85 \textwidth}
+\begin{itemize}
+\item \acrfull{rvm} is a command-line tool which allows you to easily install, manage, and work with multiple ruby environments from interpreters to sets of gems
+\item Install RVM with a Ruby
+\end{itemize}
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ \curl -L https://get.rvm.io | bash -s stable --ruby=2.0.0
+!\outputcommand{A lot of stuff}!
+$ source ~/.bashrc
+$ ruby -v
+!\outputcommand{ruby 2.0.0p247 (2013-06-27 revision 41674) [x86\_64-linux]}!
+\end{lstlisting}
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Ruby on Rails}
+\begin{itemize}
+\item Create the gemset ``\texttt{<name\_app>}'' associated with Ruby 2.0.0 while arranging to start using it immediately and setting it as the default gemset
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ rvm gemset use 2.0.0@<name\_app> --create --default
+!\outputcommand{Using ruby-2.0.0-p247 with gemset <app\_name>}!
+$ rvm gemset list
+!\outputcommand{(default)}!
+!\outputcommand{   global}!
+!\outputcommand{=> <name\_app>}!
+$ rvm current
+!\outputcommand{=> <name\_app>}!
+\end{lstlisting}
+\item Install Rails
+\begin{lstlisting}[escapechar=!]
+$ gem install rails --version=4.0.0
+!\outputcommand{A lot of stuff}!
+$ rails -v
+!\outputcommand{Rails 4.0.0}!
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Skeleton of a Rails Application}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Creating the Skeleton of the Rails Application}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ mkdir ~/rails_projects
+$ cd ~/rails_projects
+$ rails new <app_name> --skip-test-unit
+!\outputcommand{A lot of stuff}!
+$ cd <app_name>
+$ ls -p
+!\outputcommand{app/  config/    db/      Gemfile.lock  log/     Rakefile     tmp/}!
+!\outputcommand{bin/  config.ru  Gemfile  lib/          public/  README.rdoc  vendor/}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Rails Command}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ rails --help
+!\outputcommand{\dots}!
+!\outputcommand{All commands can be run with -h (or --help) for more information.}!
+$ rails new --help
+\end{lstlisting}
+$\underbrace{\text{\commandinline{rails new <app_name>}}}_{\text{Create a new Rails application}}\underbrace{\text{\commandinline{ --skip-test-unit}}}_{\text{Skip Test::Unit files}}$
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A Summary of the default Rails Directories}
+\begin{tabular}{lp{0.75 \linewidth}}
+app/ & Core application (app) code, including models, views, controllers, and helpers \\
+app/assets &	Applications assets \\
+bin/ & Binary executable files \\
+config/	& Application configuration \\
+db/ & Database files \\
+lib/ & Library modules\\
+lib/assets & Library assets\\
+log/ & Application log files \\
+public/	& Data accessible to the public\\
+tmp/ & Temporary files \\
+vendor/	& Third-party code such as plugins and gems \\
+vendor/assets & Third-party assets\\
+\end{tabular}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A Summary of the default Rails Files}
+\begin{tabular}{lp{0.75 \linewidth}}
+README.rdoc	& A brief description of the application\\
+Rakefile	& Utility tasks available via the rake command\\
+Gemfile	& Gem requirements for this app\\
+Gemfile.lock	& A list of gems used to ensure that all copies of the app use the same gem versions\\
+config.ru	& A configuration file for Rack middleware\\
+.gitignore	& Patterns for files that should be ignored by Git\\
+\end{tabular}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Bundler}
+\begin{columns}
+\column{ 0.40 \textwidth}
+\href{http://bundler.io//}{\includegraphics[width = 1.0 \textwidth]{gembundler.eps}}
+\url{http://bundler.io/}
+\column{ 0.60 \textwidth}
+\commandinline{Bundler} maintains a consistent environment for ruby applications. It tracks an application's code and the rubygems it needs to run, so that an application will always have the exact gems (and versions) that it needs to run
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Gemfile File}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[caption=A new Gemfile with an explicit version for each Ruby gem, escapechar=!]
+source 'https://rubygems.org'
+ruby '2.0.0' # Add this line !\circled{1}!
+
+gem 'rails', '4.0.0'
+
+group :development do  # It was gem 'sqlite3' !\circled{2}!
+  gem 'sqlite3', '1.3.8'
+end
+
+gem 'sass-rails', '4.0.0'
+gem 'uglifier', '2.1.1'
+gem 'coffee-rails', '4.0.0'
+gem 'jquery-rails', '3.0.4' # It was gem 'jquery-rails' !\circled{3}!
+gem 'turbolinks', '1.1.1'
+gem 'jbuilder', '1.0.2'
+
+group :doc do
+  gem 'sdoc', '0.3.20', require: false
+end
+\end{lstlisting}
+Once you’ve assembled the proper Gemfile, install the gems using \commandinline{bundle update} and \commandinline{bundle install}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ bundle update
+!\outputcommand{A lot of stuff}!
+$ bundle install
+!\outputcommand{A lot of stuff}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Rails server}
+Rails comes with a command-line program, or script, that runs a local web server, visible only from your development machine
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ rails server
+!\outputcommand{=> Booting WEBrick}!
+!\outputcommand{=> Rails 4.0.0 application starting in development on http://0.0.0.0:3000}!
+!\outputcommand{=> Run `rails server -h` for more startup options}!
+!\outputcommand{=> Ctrl-C to shutdown server}!
+\end{lstlisting}
+We can see the result of visiting \url{http://localhost:3000/}
+\begin{lstlisting}[escapechar=!]
+$ rails server -p 3456
+!\outputcommand{=> Booting WEBrick}!
+!\outputcommand{=> Rails 4.0.0 application starting in development on http://0.0.0.0:3456}!
+!\outputcommand{=> Run `rails server -h` for more startup options}!
+!\outputcommand{=> Ctrl-C to shutdown server}!
+\end{lstlisting}
+We can see the result of visiting \url{http://localhost:3456/}
+\end{frame}
+\subsection{Version Control with Git}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Repository setup}
+First-time repository setup
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+git init
+!\outputcommand{Initialized empty Git repository in ~/rails\_projects/<app\_name>/.git}!
+\end{lstlisting}
+An augmented .gitignore file
+\begin{lstlisting}[escapechar=!]
+.
+.
+.
+# Ignore other unneeded files.
+database.yml
+doc/
+*.swp
+*~
+.project
+.DS_Store
+.idea
+.secret
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Adding and committing}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ git status
+...
+# Untracked files:
+...
+#       .gitignore
+...
+\end{lstlisting}
+\begin{lstlisting}[escapechar=!]
+$ git add .
+\end{lstlisting}
+\begin{lstlisting}[escapechar=!]
+$ git status
+...
+# Changes to be committed:
+...
+#       new file:   .gitignore
+...
+\end{lstlisting}
+
+\begin{lstlisting}[escapechar=!]
+$ git commit -m "Initialize repository"
+\end{lstlisting}
+\begin{lstlisting}[escapechar=!]
+$ git log
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{GitHub}
+\href{http://github.com}{\includegraphics[width = 0.50 \textwidth]{github.eps}}\\
+\url{http://github.com}
+
+GitHub is a social coding site optimized for hosting and sharing Git repositories
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Push to GitHub}
+These commands tell Git that you want to add GitHub as the origin for your main (master) branch and then push your repository up to GitHub
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ git remote add origin git@github.com:<username>/<app_name>.git
+$ git push -u origin master
+\end{lstlisting}
+It's necessary to add a public key to your GitHub account \href{https://help.github.com/articles/generating-ssh-keys}{\alert{Help? Click here \dots}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deploying}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Heroku PAAS}
+\includegraphics[width = 0.25 \textwidth]{heroku.eps} 
+
+\emph{``Heroku is a polyglot cloud application platform. With Heroku, you don’t need to think about servers at all. You can write apps using modern development practices in the programming language of your choice, back it with add-on resources such as SQL and NoSQL databases, Memcached, and many others. You manage your app using the Heroku command-line tool and you deploy code using the Git revision control system, all running on the Heroku infrastructure.''}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Heroku Setup} 
+Heroku uses the PostgreSQL database, which means that we need to add the pg gem in the production environment to allow Rails to talk to Postgres
+\lstset{language=ruby, style=eclipse}
+\begin{lstlisting}
+.
+.
+.
+group :production do
+  gem 'pg', '0.15.1'
+  gem 'rails_12factor', '0.0.2'
+end
+\end{lstlisting}
+To install it, we run \commandinline{bundle install} with a special flag:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ bundle install --without production
+\end{lstlisting}
+Then 
+\begin{lstlisting}[escapechar=!]
+$ git commit -a -m "Update Gemfile.lock for Heroku"
+\end{lstlisting}
+
+The heroku command-line tool is an interface to the Heroku Web API and includes support for things like creating/renaming apps, running one-off dynos, taking backups, and configuring add-ons
+
+\begin{lstlisting}[escapechar=!]
+$ sudo  wget --no-check-certificate -qO- https://toolbelt.heroku.com/install.sh | sh
+
+$ echo 'PATH="/usr/local/heroku/bin:$PATH"' >> ~/.bashrc
+$ source  ~/.bashrc
+\end{lstlisting}
+
+It's necessary to create a public/private key pair to deploy code to Heroku. \href{https://devcenter.heroku.com/articles/keys}{\alert{Help? Click here \dots}}
+
+\begin{lstlisting}[escapechar=!]
+$ heroku login
+$ cd ~/rails_projects/<app_name>
+$ heroku create
+$ git push heroku master
+$ heroku open
+\end{lstlisting}
+
+Perhaps...
+\begin{lstlisting}[escapechar=!]
+$ heroku run rake db:migrate
+\end{lstlisting}
+
+\end{frame}
+
+\subsection{Vocabulary}
+\begin{frame}[fragile]
+\frametitle{Vocabulary}
+Ruby, rvm, gemset, gem, Rails, bundler, Test::Unit, Git, Rack, Gemfile, Gemfile.lock, GitHub, Heroku, ssh, key, MemCached, PostgreSQL, NoSQL
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\section{A Content Management System}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Adding Users and Gropus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building a News Blog with RSS Feeds and an API}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building a Discussion Forum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building a Blogging Engine with Web Services Support}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building a Photo Gallery}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sending E-mail and Building a Newsletter Mailing List}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Adding Friends with XFN Details}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Adding Tags to the Photo Gallery}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Creating Mashups and Integrating with Web 2.0}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Adding User-Created Themes to the Blogging Engine}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{A Mobile Interface}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Deploying, Optimizing, and Scaling the Application}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\end{document}

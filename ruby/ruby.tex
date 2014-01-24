@@ -1,0 +1,1170 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{hyperref}
+%\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{multirow}
+
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstloadlanguages{Ruby}
+\usepackage{cancel}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{amsmath}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+
+\newcommand{\comment}[2]{#2}
+
+\newcommand{\commandinline}[1]{\lstinline[basicstyle=\small\lstfontfamily]{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+\graphicspath{ {./images/} }
+
+\title{Ruby Basics}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{./images/logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{./images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\selectlanguage{british}
+
+
+
+\begin{document}
+
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  %\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  \tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+%\input{../glossary}
+
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{css}{CSS}{cascading style sheets}
+\newacronym{ebs}{EBS}{Elastic Block Storage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ruby}
+\begin{frame}[fragile]
+\frametitle{Ruby}
+\begin{columns}
+ \column{0.20 \textwidth}{\includegraphics[width= 1.0 \textwidth]{ruby.eps}}
+ \column{0.80 \textwidth}
+ \begin{itemize}
+  \item The invertor of Ruby, Yukihiro Matsumoto (1995) states in his book ``The Ruby Programming Language'' that:
+  \begin{verbatim}
+     It is easy to programs in Ruby,
+     but Ruby is not a simple language.
+  \end{verbatim} 
+  \item Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write
+
+  \item \url{http://www.ruby-lang.org}
+ \end{itemize}
+
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Setting Up Ruby Environment}
+\begin{frame}[fragile]
+\frametitle{Setting Up Ruby Environment}
+As user \texttt{invitado}, carry out the steps for installing Ruby 2.0.0
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ \curl -L https://get.rvm.io | bash
+!\outputcommand{A lot of stuff}!
+$ source /home/invitado/.rvm/scripts/rvm
+$ rvm docs generate
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hello World!}
+\begin{frame}[fragile]
+\frametitle{Hello World!}
+\begin{columns}
+\column{0.5 \textwidth}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+# The famous Hello World
+# Program is trivial in
+# Ruby. Superfluous:
+#
+# * A "main" method
+# * Newline
+# * Semicolons
+#
+# Here is the Code:
+
+puts "Hello World!"
+\end{lstlisting}
+\column{0.5 \textwidth}
+\lstset{language=C, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#include<stdio.h>
+
+int main(int arg_count,
+         char ** arg_values)
+{
+ printf("Hello World\n");
+ return 0;
+}
+\end{lstlisting}
+\end{columns}
+\begin{itemize}
+ \item Use your favorite editor to open a new file with the filename \texttt{hello-world}.rb and insert the above lines into it. You can execute this Ruby program in the command lines as follows:
+
+\lstset{language=shell}
+\begin{lstlisting}[ numbers=none, escapechar=!]
+$ ruby hello-world.rb
+\end{lstlisting}
+\end{itemize}
+
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texttt{irb}}
+\begin{frame}[fragile]
+\frametitle{\texttt{irb}}
+\begin{itemize}
+ \item \texttt{irb} stands for ``InteractiveRuby'' and is a kind of sandbox where you can play around with Ruby at your leisure, \texttt{irb} is launched by entering \texttt{irb} on the shell and ends if you enter \texttt{exit}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none,escapechar=&]
+$ irb --simple-prompt
+>> puts "Hello World!"
+Hello World!
+=> nil
+>> exit
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ruby is Object Oriented}
+\begin{frame}[fragile]
+\frametitle{Ruby is Object Oriented}
+\begin{itemize}
+ \item Ruby only knows objects
+ \item Everything is an object
+ \item Every object is an instance of a class
+ \item An object is encapsulated and can only be reached from the outside via the methods of the corresponding object.
+ \item I cannot change any property of an object directly from the outside. The corresponding object has to offer a method with which I can do so
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Methods}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Methods}
+\begin{block}{Important}
+\alert{Names of methods are always written in snake case}
+\end{block}
+
+In other programming languages, the terms you would use for Ruby methods would be: functions, procedures, subroutines and of course methods
+
+\begin{itemize}
+
+\item We want to ouput the string \texttt{``Hello World!''} three times in a row
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# three_times.rb
+def three_times
+  puts 'Hello World!'
+  puts 'Hello World!'
+  puts 'Hello World!'
+end
+
+three_times
+\end{lstlisting}
+
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=&]
+$ ruby three_times.rb
+&\outputcommand{Hello World!\\
+Hello World!\\
+Hello World!}&
+\end{lstlisting}
+
+\item You can define parameters and use then within the method
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# three_times.rb
+def three_times value
+  puts value
+  puts value
+  puts value
+end
+
+three_times 'Hello World!'
+\end{lstlisting}
+
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=&]
+$ ruby three_times.rb
+&\outputcommand{Hello World!\\
+Hello World!\\
+Hello World!}&
+\end{lstlisting}
+
+\item You can give the variable \texttt{value} a default value and then you can also call the method without parameter
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# three_times.rb
+def three_times value='Hello World!'
+  puts value
+  puts value
+  puts value
+end
+
+three_times
+\end{lstlisting}
+
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=&]
+$ ruby three_times.rb
+&\outputcommand{Hello World!\\
+Hello World!\\
+Hello World!}&
+\end{lstlisting}
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{return}
+\begin{itemize}
+\item Ruby returns the value of the last expression as a default
+\begin{columns}
+ \column{0.5 \textwidth}
+  \lstset{language=Ruby, style=eclipse}
+  \begin{lstlisting}[escapechar=&]
+def area_of_a_circle radius
+  pi = 3.14
+  return area = pi * radius * radius
+end
+
+puts area_of_a_circle 10
+  \end{lstlisting}
+
+ \column{0.5 \textwidth}
+\lstset{language=Ruby, style=eclipse}
+  \begin{lstlisting}[escapechar=&]
+def area_of_a_circle radius
+  pi = 3.14
+  area = pi * radius * radius
+end
+
+puts area_of_a_circle 10
+  \end{lstlisting}
+\end{columns}
+\end{itemize}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=&]
+$ ruby area_of_a_circle
+&\outputcommand{314.0}&
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classes}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Classes}
+\begin{block}{Important}
+\alert{The name of a class always starts with an upper case letter (Camel Case)}
+\end{block}
+\begin{itemize}
+\item A class is a collection of methods
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# camel_case.rb
+class CamelCase
+  def three_times
+    puts 'Hello World!'
+    puts 'Hello World!'
+    puts 'Hello World!'
+  end
+end
+
+snake_case = CamelCase.new
+snake_case.three_times
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=&]
+$ ruby three_times.rb
+&\outputcommand{Hello World!\\
+Hello World!\\
+Hello World!}&
+\end{lstlisting}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Private methods}
+\begin{itemize}
+\item Quite often it make sense to only call a method within its own class or own instance.
+Such methods are referred to as private methods
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# example.rb
+class Example
+  def a
+    puts 'a'
+  end
+
+  private
+  def b
+    puts 'b'
+  end
+end
+
+test = Example.new
+test.a
+test.b
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby example.rb
+!\outputcommand{a\\
+example.rb:15:in `<main>': private method `b' called for \#<Example:0xa199b3c> (NoMethodError)}!
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Method \texttt{initialize()}}
+\begin{itemize}
+\item If a new instance is created, the method that is processed first and automatically is the method \texttt{initialize}.
+The method is automatically a private method
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# room.rb
+class Room
+  def initialize
+    puts 'abc'
+  end
+end
+
+kitchen = Room.new
+kitchen.initialize
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby room.rb
+abc
+!\outputcommand{room.rb:9:in `<main>': private method `initialize' called for \#<Room:0x8529ce0> (NoMethodError)}!
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Inheritance}
+\begin{itemize}
+\item A class can inherit from another class. When defining the class, the parent class must be added with a \texttt{\textless} (smaller than) sign: 
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# a_b.rb
+class A
+  def a
+    puts 'a'
+  end
+end
+
+class B < A
+  def b
+    puts 'b'
+  end
+end
+
+a = A.new
+a.a
+b = B.new
+b.a
+b.b
+a.b
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby a_b.rb
+!\outputcommand{a\\
+a\\
+b\\
+a\_b.rb:21:in `<main>': undefined method `b' for \#<A:0x9b258f0> (NoMethodError)\\}!
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Class Methods and Instance Methods}
+\begin{itemize}
+\item A class method can only be called in connection with the class
+\item An instance method is a method than only works with an instance (you cannot apply the method \texttt{new} to an instance)
+
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# knowledge.rb
+class Knowledge
+  def pi
+    puts 3.14
+  end
+end
+knowledge = Knowledge.new
+knowledge.pi
+Knowledge.pi
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby knowledge.rb
+!\outputcommand{3.14\\
+knowledge.rb:9:in `<main>': undefined method `pi' for Knowledge:Class (NoMethodError)
+}!
+\end{lstlisting}
+
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# knowledge.rb
+class Knowledge
+  def self.pi
+    puts 3.14
+  end
+end
+Knowledge.pi
+knowledge = Knowledge.new
+knowledge.pi
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby knowledge.rb
+!\outputcommand{3.14\\
+knowledge.rb:9:in `<main>': undefined method `pi' for \#<Knowledge:0x9451c04> (NoMethodError)
+}!
+\end{lstlisting}
+
+\item There are different notations for defining class methods
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# knowledge.rb
+class Knowledge
+  class << self
+    def pi
+      puts 3.14
+    end
+  end
+end
+Knowledge.pi
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Variables}
+\begin{frame}[fragile]
+\frametitle{Variables}
+\begin{itemize}
+ \item Yoy already know that everything in Ruby is an object. So a variable must also be an object
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Naming Conventions}
+\begin{frame}[fragile]
+\frametitle{Naming Conventions}
+\begin{block}{Important!}
+\begin{itemize}
+  \item In general variables are written in lower case. Constants start with an upper case letter
+  \item A constant can also be overwritten with a new value in Ruby (Do not rely on the constancy of a constant!)
+\end{itemize}
+
+\end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strings}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Strings}
+\begin{itemize}
+ \item Single Quotation Marks
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# string.rb
+a = 'I am a string'
+puts a
+b = String.new
+puts b
+c = String.new 'I am also a string'
+puts c
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby string.rb
+!\outputcommand{I am a string\\
+\hspace{1cm}\\
+I am also a string\\
+}!
+\end{lstlisting}
+ \item Doble Quotation Marks
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# string.rb
+a = 'blue'
+puts "Color #{a}"
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby string.rb
+!\outputcommand{
+Color blue\\
+}!
+\end{lstlisting}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integers}
+\begin{frame}[fragile]
+\frametitle{Integers}
+\begin{itemize}
+ \item A \texttt{Fixnum} is an \texttt{Integer} that can be saved in a ``word''. If a \texttt{Fixnum} gets bigger, it automatically becomes a \texttt{Bignum}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# integer.rb
+puts 33.class
+a = 2014
+puts a.class
+a = a*9999
+puts a.class
+a = a*9999
+puts a.class
+\end{lstlisting}
+\end{itemize}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$  ruby integer.rb 
+!\outputcommand{Fixnum\\
+Fixnum\\
+Fixnum\\
+Bignum
+}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Floats}
+\begin{frame}[fragile]
+\frametitle{Floats}
+\begin{itemize}
+ \item \texttt{Float} is a class for real numbers. The decimal separator is a point
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# float.rb
+puts 3.14.class
+pi = 3.14
+puts pi
+puts pi.class
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby float.rb 
+!\outputcommand{
+Float\\
+3.14\\
+Float
+}!
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boolean Values and \texttt{nil}}
+\begin{frame}[fragile]
+\frametitle{Boolean Values and \texttt{nil}}
+\begin{itemize}
+ \item There are separate classes for boolean values (\texttt{true} and \texttt{false}) and for \texttt{nil} (no value) 
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# boolean.rb
+puts true.class
+puts false.class
+puts nil.class
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby boolean.rb 
+!\outputcommand{
+TrueClass\\
+FalseClass\\
+NilClass
+}!
+\end{lstlisting}
+\item Number \texttt{0} is \texttt{true}
+\item \texttt{nil} is false
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scope of Variables}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Scope of Variables}
+\begin{itemize}
+ \item Local variables start with a lower case or an underscore (\texttt{\_})
+ \item A global variable starts with a \texttt{\$}-sign and is accesible in the entire program. They are used very rarely
+ \item Instance variables or ``Attributes'' start with \texttt{@}) and they are only apply within a class
+ \item Class variables are available throughout a class or module body and they start with  \texttt{@@}-signs
+\end{itemize}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# scope.rb
+
+class Song
+  @@count = 0
+
+  def initialize title
+    @title = title
+    @@count += 1
+  end
+
+  def dump
+    puts "title: #{@title}, count: #{@@count}"
+  end
+end
+
+song1 = Song.new "No cambies"
+song1.dump
+
+song2 = Song.new "Mi carro"
+song2.dump
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby scope.rb 
+!\outputcommand{
+title: No cambies, count: 1\\
+title: Mi carro, count: 2\\
+}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Getters and Setters}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Getters and Setters}
+\begin{itemize}
+ \item As instance variable only exist within the relevant instance, you always need to write a ``getter'' method for exporting such a variable
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# getters_and_setters.rb
+
+class Room
+  def initialize
+    @doors = 1
+    @windows = 1
+  end
+
+  def doors
+    @doors
+  end
+
+  def windows
+    @windows
+  end
+end
+
+room = Room.new
+puts "doors: #{room.doors}, windows: #{room.windows}"
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+doors: 1, windows: 1
+}!
+\end{lstlisting}
+\item As this scenario is so common, there is already a ready-made getter method for it with the name \texttt{attr\_reader}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# getters_and_setters.rb
+
+class Room
+  def initialize
+    @doors = 1
+    @windows = 1
+  end
+
+  attr_reader :doors, :windows
+end
+
+room = Room.new
+puts "doors: #{room.doors}, windows: #{room.windows}"
+\end{lstlisting}
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+doors: 1, windows: 1
+}!
+\end{lstlisting}
+
+\item A ``setter'' method changes an attribute from outside
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# getters_and_setters.rb
+
+class Room
+  def initialize
+    @doors = 1
+    @windows = 1
+  end
+
+  attr_reader :doors, :windows
+
+  def doors= value
+    @doors = value
+  end
+
+  def windows= value
+    @windows = value
+  end
+end
+
+room = Room.new
+room.doors = 2
+room.windows = 3
+puts "doors: #{room.doors}, windows: #{room.windows}"
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+doors: 2, windows: 3
+}!
+\end{lstlisting}
+
+\item As this scenario is so common, there is already a ready-made setter method for it with the name \texttt{attr\_writter}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# getters_and_setters.rb
+
+class Room
+  def initialize
+    @doors = 1
+    @windows = 1
+  end
+
+  attr_reader :doors, :windows
+  attr_writer :doors, :windows
+end
+
+room = Room.new
+room.doors = 2
+room.windows = 3
+puts "doors: #{room.doors}, windows: #{room.windows}"
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+doors: 2, windows: 3
+}!
+\end{lstlisting}
+\item There is even a method \texttt{attr\_accessor} that combines getter and setters
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# getters_and_setters.rb
+
+class Room
+  def initialize
+    @doors = 1
+    @windows = 1
+  end
+
+  attr_accessor :doors, :windows
+end
+
+room = Room.new
+room.doors = 2
+room.windows = 3
+puts "doors: #{room.doors}, windows: #{room.windows}"
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+doors: 2, windows: 3
+}!
+\end{lstlisting}
+
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Build-In Methods for Strings}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Build-In Methods for Strings}
+\begin{itemize}
+ \item Most classes already come with a set of very useful methods
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, postbreak=, postbreak=]
+$ irb --simple-prompt
+>> String.instance_methods false
+=> [:<=>, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :byteslice, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :<<, :prepend, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :b, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c]
+>> exit
+\end{lstlisting}
+
+\item If you are not sure what one of these methods does you can use \texttt{ri} to look it up
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ri -T String.size
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Method Chaining}
+\begin{frame}[fragile]
+\frametitle{Method Chaining}
+\begin{itemize}
+ \item It is perfectly logical to chain different methods in Ruby
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# chaining.rb
+
+a = String.new('A dog').upcase.reverse # Or String.new 'A dog'.upcase.reverse?
+puts a
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby chaining.rb
+!\outputcommand{
+GOD A
+}!
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{if-Condition}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{if-Condition}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# if.rb
+
+a=10
+
+if a==10
+  puts 'a is 10'
+end
+
+puts 'a is 10' if a==10
+puts 'a is 10' unless a!=10
+
+if a==10
+  puts 'a is 10'
+else
+  puts 'a is not 10'
+end
+
+if a==10
+  puts 'a is 10'
+elsif a==20
+  puts 'a is 20'
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby getters_and_setters.rb
+!\outputcommand{
+a is 10\\
+a is 10\\
+a is 10\\
+a is 10\\
+a is 10\\
+}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Loops}
+\begin{frame}[fragile]
+\frametitle{Loops}
+\begin{itemize}
+ \item There are different ways of implementing loops in Ruby. The iterator is used particularly often in the Rails environment
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{While and until}
+\begin{frame}[fragile]
+\frametitle{While and until}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# while.rb
+
+i = 0
+while i < 5 do
+  puts i
+  i = i+1
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby while.rb
+!\outputcommand{
+0\\
+1\\
+2\\
+3\\
+4}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Block and Iterators}
+\begin{frame}[fragile]
+\frametitle{Block and Iterators}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# times.rb
+
+5.times { |i| puts i}
+
+5.times do |i|
+  puts i
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby while.rb
+!\outputcommand{
+0\\
+1\\
+2\\
+3\\
+4\\
+0\\
+1\\
+2\\
+3\\
+4}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Arrays and Hashes}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Arrays and Hashes}
+\begin{itemize}
+ \item As in many programming languages, ``arrays'' and ``hashes'' are popular structures in Ruby for storing data
+ \item An array is a list of objects 
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# arrays.rb
+
+a = [3, 4 ,5]
+a.each do |i|
+  puts i
+end
+
+b = a.map{|i| i*i}
+b.each do |i|
+  puts i
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby arrays.rb
+!\outputcommand{
+3\\
+4\\
+5\\
+9\\
+16\\
+25}!
+\end{lstlisting}
+ \item A ``Hash'' is a list of key/value pairs
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# hashes.rb
+
+price = {'eggs' => 0.99, 'butter' => 9.9}
+
+puts price['eggs']
+puts price['butter']
+
+price.each do |key, value|
+  puts "#{key}, #{value}"
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby hashes.rb
+!\outputcommand{
+0.99\\
+9.9\\
+eggs, 0.99\\
+butter, 9.9
+}!
+\end{lstlisting}
+
+\item Notation for hashes (Ruby > 2.0.0)
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# hashes.rb
+price1 = {'egg' => 0.99, 'butter' => 9.9}
+price2 = {:egg => 0.99, :butter => 9.9}
+price3 = {egg: 0.99, butter: 9.9}
+
+puts "price1 is#{(price1==price2)?' ': ' not '} equal to price2"
+puts "price2 is#{(price2==price2)?' ': ' not '} equal to price3"
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[numbers=none, escapechar=!]
+$ ruby hashes.rb
+!\outputcommand{
+price1 is not  equal to price2\\
+price2 is equal to price3
+}!
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Regular Expressions}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Regular Expressions}
+\begin{itemize}
+ \item A regular expression is a pattern that can be matched against a string
+ \item The most common way of creating a regulr expression patter is to write it between forward slashes
+ \item All characters except \texttt{., |, (, ), [, ], \{, \}, +, \, \^{}, \$, *, ? } match themselves
+\end{itemize}
+\pagebreak
+ \begin{tabular}{ll}
+/[Rr]uby/  & Match ``Ruby'' or ``ruby''\\
+/rub[ye]/ & Match ``ruby'' or ``rube''\\
+/[aeiou]/ & Match any one lowercase vowel\\
+/[0-9]/ & Match any digit; same as /[0123456789]/\\
+/[a-z]/   & Match any lowercase ASCII letter\\
+/[A-Z]/   & Match any uppercase ASCII letter\\
+/[a-zA-Z0-9] & Match any of the above\\
+/[\^{}aeiou]/  & Match anything other than a lowercase vowel\\
+/[\^{}0-9]/ & Match anything other than a digit\\
+ \end{tabular} 
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{More? }
+\begin{frame}[fragile]
+\frametitle{More}
+\begin{itemize}
+ \item Symbols
+ \item Mixing
+ \item Exceptions, Catch and Throw
+ \item Input and Output
+ \item Metaprogramming
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -1,0 +1,153 @@
+\usepackage{color}
+
+% extension, if, then, else, switch, Void, Boolean, Integer, Real, String, let
+
+%\definecolor{green}{rgb}{0.0,1.0,0.0}
+\lstdefinelanguage{shell}
+{
+  alsodigit={>},
+  basicstyle=\scriptsize\lstfontfamily,
+  emphstyle=\color{red}\bfseries, 
+  keywordstyle=\color{darkviolet}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{darkblue},
+  numberstyle=\color{darkgrey}\lstfontfamily,
+  emphstyle=\color{red},
+  morecomment=[s][\color{lightblue}]{/**}{*/},
+%  columns=fullflexible, %spaceflexible, %flexible, fullflexible             
+%  escapeinside=`',
+%  escapechar=@,
+  showstringspaces=false,
+% numbers=left
+  breaklines=true,
+  numbers=none,
+  morekeywords={cd, ls, mkdir, yum, wget, curl, su, chmod, echo, ssh, adduser, createuser, git, service, chkconfig, setenforce, system-config-firewall-tui, rm, rpm},
+  backgroundcolor=\color{lstbackgroundshellcolor},
+  %keywordstyle=\color{green}
+  literate={\$}{{\textcolor{blue}{\$}}}1
+}
+
+
+
+\lstdefinelanguage{KLP}
+{morekeywords={ 
+    ADD, ADDI, AND,
+    DIV, DIVI, DONE, 
+    EQ,
+    GOTO,
+    IADD, IAND, IDIV, IEQ, IGE, IGT, ILE, ILT, INITC, INITV, INPUT, 
+    ICMOV, IRMOV, ISUB, IVMOV, IOR, IXOR, 
+    IMUL,
+    JF, JMP, JNZ, JT, JZ,
+    LOCAL,
+    MUL, MULI,
+    NEQ,
+    OUTPUT,
+    PRIO,
+    RRMOV, 
+    SETCLK, SETPC,
+    SUB, SUBI,
+    VVMOV,
+    XOR
+  },
+  morecomment=[l]{//},
+  morecomment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  morecomment=[l]{\%},
+  morestring=[b]",
+}
+
+
+\newcommand{\lstfontfamily}{\ttfamily}
+%\newcommand{\lstfontfamily}{\sffamily} % Adapt to schneider
+\newcommand{\textlst}[1]{\texttt{#1}}
+\newcommand{\mathlst}[1]{\mathtt{#1}}
+\lstdefinestyle{tiny}{basicstyle=\tiny\lstfontfamily}
+\lstdefinestyle{scriptsize}{basicstyle=\scriptsize\lstfontfamily}
+\lstdefinestyle{footnotesize}{basicstyle=\footnotesize\lstfontfamily}
+\lstdefinestyle{small}{basicstyle=\small\lstfontfamily}
+\lstdefinestyle{normalsize}{basicstyle=\normalsize\lstfontfamily}
+\lstdefinestyle{large}{basicstyle=\lstfontfamily}
+
+\lstdefinestyle{monitor}{morekeywords={monitor, export}}
+\lstdefinestyle{ConcPascal}{language=Pascal,style=monitor}
+
+% To make this accessible to Emacs/AUCTeX (C-c C-f C-o),
+% add something like this to TeX-mode-hook:
+%  (setq LaTeX-font-list
+%       (append '((?{\^O} "\\codefont{" "}"))
+%               LaTeX-font-list))
+%\newcommand{\codefont}[1]{{\renewcommand{\textnormal}[1]{\textlst{#1}}\lstfontfamily #1}}
+\newcommand{\mathcodefont}[1]{\mathtt{#1}}
+\newcommand{\codefont}[1]{{\lstfontfamily #1}}
+\newlength{\lstframexleftmargin}
+\setlength{\lstframexleftmargin}{1mm}
+
+% rulesepcolor and backgroundcolor are set in beamercustom{presentation|handout}.sty
+\lstdefinestyle{mydefault}{
+  style=scriptsize,
+  emphstyle=\color{red},
+  framexleftmargin=\lstframexleftmargin, 
+  frame=shadowbox, 
+  keywordstyle=\structure,
+  commentstyle=\itshape,
+  columns=flexible,            % Columns not rigid - gives nicer spacing 
+  gobble=4,                    % Gobble first 4 characters of each line
+  escapeinside=`',
+  escapechar=@,
+  lineskip=+0.2ex,
+  rulesepcolor=\color{lstrulesepcolor},
+  % WARNING: For some reason, the settin of backgroundcolor must take
+  % place at the very end!!! 
+  backgroundcolor=\color{lstbackgroundprogcolor},
+}
+
+\definecolor{darkviolet}{rgb}{0.5,0,0.4}
+\definecolor{darkgreen}{rgb}{0,0.4,0.2} 
+\definecolor{darkblue}{rgb}{0.1,0.1,0.9}
+\definecolor{darkgrey}{rgb}{0.5,0.5,0.5}
+\definecolor{lightblue}{rgb}{0.4,0.4,1}
+
+\lstdefinestyle{eclipse}{
+  basicstyle=\scriptsize\lstfontfamily,
+  emphstyle=\color{red}\bfseries, 
+  keywordstyle=\color{darkviolet}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{darkblue},
+  numberstyle=\color{darkgrey}\lstfontfamily,
+  emphstyle=\color{red},
+    % get also javadoc style comments
+  morecomment=[s][\color{lightblue}]{/**}{*/},
+   %columns=fullflexible, %spaceflexible, %flexible, fullflexible             
+%  escapeinside=`',
+%  escapechar=@,
+  showstringspaces=false,
+  numbers=none,
+  upquote=true,
+  backgroundcolor=\color{lstbackgroundshellcolor},
+  breaklines=true,
+}
+
+\lstdefinestyle{black}{
+  basicstyle=\small\lstfontfamily,
+  numbers=left,
+  columns=fullflexible,
+  breaklines=true,
+  mathescape=true,
+  escapechar=\#,
+  tabsize=4,
+  frame=lines,
+  showstringspaces=false
+}
+
+% use proper tt font that supports bold printing, e.g. by
+% \usepackage{courier}
+\lstdefinestyle{seminar}{
+  basicstyle=\small\ttfamily,
+  numbers=left,
+  breaklines=true,
+  mathescape=true,
+  escapechar=\#,
+  tabsize=4,
+  showstringspaces=false
+}

@@ -1,0 +1,13 @@
+\documentclass{article}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+
+
+\begin{document}
+
+
+
+\section{About "quotes"}
+A "quote" is a "quote" is a "quote".
+\end{document}

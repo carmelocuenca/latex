@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>ruby.tex - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body class="file">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./doc/created_rid.html">created.rid</a>
+  
+    <li class="file"><a href="./lstcustom_sty.html">lstcustom.sty</a>
+  
+    <li class="file"><a href="./lstcustom_sty_backup.html">lstcustom.sty.backup</a>
+  
+    <li class="file"><a href="./lstcustom_sty~.html">lstcustom.sty~</a>
+  
+    <li class="file"><a href="./ruby_acn.html">ruby.acn</a>
+  
+    <li class="file"><a href="./ruby_aux.html">ruby.aux</a>
+  
+    <li class="file"><a href="./ruby_glo.html">ruby.glo</a>
+  
+    <li class="file"><a href="./ruby_glsdefs.html">ruby.glsdefs</a>
+  
+    <li class="file"><a href="./ruby_log.html">ruby.log</a>
+  
+    <li class="file"><a href="./ruby_nav.html">ruby.nav</a>
+  
+    <li class="file"><a href="./ruby_out.html">ruby.out</a>
+  
+    <li class="file"><a href="./ruby_snm.html">ruby.snm</a>
+  
+    <li class="file"><a href="./ruby_tex.html">ruby.tex</a>
+  
+    <li class="file"><a href="./ruby_tex_backup.html">ruby.tex.backup</a>
+  
+    <li class="file"><a href="./ruby_tex~.html">ruby.tex~</a>
+  
+    <li class="file"><a href="./ruby_toc.html">ruby.toc</a>
+  
+    <li class="file"><a href="./ruby_vrb.html">ruby.vrb</a>
+  
+    <li class="file"><a href="./ruby_xdy.html">ruby.xdy</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./A.html">A</a>
+  
+    <li><a href="./B.html">B</a>
+  
+    <li><a href="./Example.html">Example</a>
+  
+    <li><a href="./Knowledge.html">Knowledge</a>
+  
+    <li><a href="./Object.html">Object</a>
+  
+    <li><a href="./Room.html">Room</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation" class="description">
+  
+<p>documentclass{beamer} usepackage[british,spanish]{babel}
+usepackage[utf8]{inputenc}</p>
+
+<p>usepackage{hyperref}
+%hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W
+1}}</p>
+
+<p>usepackage{multirow}</p>
+
+<p>usepackage{textcomp}</p>
+
+<p>usepackage{listings} lstloadlanguages{Ruby} usepackage{cancel}</p>
+
+<p>usepackage{adjustbox} usepackage{lstcustom}</p>
+
+<p>usepackage{amsmath}</p>
+
+<p>usepackage{color} definecolor{light-gray}{gray}{0.80}
+definecolor{lstbackgroundshellcolor}{named}{light-gray}</p>
+
+<p>usepackage{tikz} newcommand*circled[1]{<a
+href=“http://baseline=(char.base)”>tikz</a>{</p>
+
+<pre>\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}</pre>
+
+<p>usepackage[normalem]{ulem}</p>
+
+<p>%<a href=“http://acronym,xindy,toc”>usepackage</a>{glossaries}</p>
+
+<p>usepackage[acronym,xindy,toc]{glossaries} makeglossaries %<a
+href=“http://xindy”>usepackage</a>{imakeidx} %makeindex</p>
+
+<p>newcommand<a href="http://2">comment</a>{#2}</p>
+
+<p>newcommand<a href="http://1">commandinline</a>{color{darkgreen}{#1}}</p>
+
+<p>graphicspath{ {../images/} }</p>
+
+<p>title{Ruby Basics} %subtitle[short subtitle]{long subtitle} author[C.
+Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca
+Quintana-Domínguez} %institute{Escuela Universitaria de Informática} %<a
+href=“http://04/2013”>date</a>{Abril - 2013} date{}
+titlegraphic{includegraphics[width=0.5
+textwidth]{../images/logo_ulpgc_version_horizontal_rgb.eps}}</p>
+
+<p>pgfdeclareimage[width=2.0baselineskip]{ulpgc-logo}{../images/logosimbolo_secundario_version_vertical}
+setbeamertemplate{footline}{raisebox{-2ex}{pgfuseimage{ulpgc-logo}}</p>
+
+<pre>\usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+\usebeamertemplate{navigation symbols}\hfill
+\insertframenumber{}/\inserttotalframenumber}</pre>
+
+<p>setbeamertemplate{sidebar right}{}</p>
+
+<p>usetheme{Antibes} %usetheme{Berlin}</p>
+
+<p>%usetheme{Warsaw} %usecolortheme{albatross}</p>
+
+<p>selectlanguage{british}</p>
+
+<p>begin{document}</p>
+
+<p>begin{frame}</p>
+
+<pre>\titlepage</pre>
+
+<p>end{frame}</p>
+
+<p>section*{Outline} begin{frame}</p>
+
+<pre>\frametitle{Outline}
+%\tableofcontents%[part=1,pausesections]
+\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+%\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]</pre>
+
+<p>end{frame}</p>
+
+<p>%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%newacronym{&lt;label&gt;}{&lt;abbrv&gt;}{&lt;full&gt;}
+%glsreset{&lt;label&gt;} %glsresetall %acrlong{&lt;label&gt;}
+%acrfull{&lt;label&gt;} %acrshort{&lt;label&gt;} %input{../glossary}</p>
+
+<p>newacronym<a href="http://fragile">aws}{AWS}{Amazon Web Services}
+newacronym{css}{CSS}{cascading style sheets} newacronym{ebs}{EBS}{Elastic
+Block Storage} newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+newacronym{elb}{ELB}{Elastic Load Balancing}
+newacronym{ror}{RoR}{{href{http://rubyonrails.org/}{Ruby on Rails}}}
+newacronym{rds}{RDS}{Relational Database Service}
+newacronym{rvm}{RVM}{{href{https://rvm.io/}{Ruby Version Manager}}}
+newacronym{s3}{S3}{Simple Storage Service} newacronym{sqs}{SQS}{Amazon
+Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Ruby} begin{frame</a> frametitle{Ruby} begin{columns}</p>
+
+<pre>\column{0.20 \textwidth}{\includegraphics[width= 1.0 \textwidth]{ruby.eps}}
+\column{0.80 \textwidth}
+\begin{itemize}
+ \item The invertor of Ruby, Yukihiro Matsumoto (1995), states in his book ``The Ruby Programming Language&#39;&#39; that:
+ \begin{verbatim}
+    It is easy to programs in Ruby,
+    but Ruby is not a simple language.
+ \end{verbatim} 
+ \item Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write
+
+ \item \url{http://www.ruby-lang.org}
+\end{itemize}</pre>
+
+<p>end{columns}</p>
+
+<p>end<a href="http://fragile">frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Setting Up Ruby Environment} begin{frame</a> frametitle{Setting Up
+Ruby Environment} As user texttt{invitado}, carry out the steps for
+installing Ruby 2.0.0</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=!] $ curl -L <a href="https://get.rvm.io">get.rvm.io</a> | bash
+!outputcommand{A lot of stuff}! $ source /home/invitado/.rvm/scripts/rvm
+end{lstlisting}</p>
+
+<p>end<a href="http://fragile">frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Hello World!} begin{frame</a> frametitle<a
+href="http://escapechar=!">Hello World!} begin{columns} column{0.5
+textwidth} lstset{language=Ruby, style=eclipse} begin{lstlisting</a> # The
+famous Hello World # Program is trivial in # Ruby. Superfluous: # # * <a
+href="A.html">A</a> “main” method # * Newline # * Semicolons # # Here is
+the Code:</p>
+
+<p>puts “Hello World!” end<a href="http://escapechar=!">lstlisting} column{0.5
+textwidth} lstset{language=C, style=eclipse} begin{lstlisting</a>
+include&lt;stdio.h&gt;</p>
+
+<p>int main(int arg_count,</p>
+
+<pre>char ** arg_values)</pre>
+
+<p>{</p>
+
+<pre>printf(&quot;Hello World\n&quot;);
+return 0;</pre>
+
+<p>} end{lstlisting} end{columns} begin{itemize}</p>
+
+<pre>\item Use your favorite editor to open a new file with the filename \texttt{hello-world}.rb and insert the above lines into it. You can execute this Ruby program in the command lines as follows:</pre>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[ numbers=none,
+escapechar=!] $ ruby hello-world.rb end{lstlisting} end{itemize}</p>
+
+<p>end<a href="http://fragile">frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{texttt{irb}} begin{frame</a> frametitle{texttt{irb}} begin{itemize}</p>
+
+<pre>\item \texttt{irb} stands for ``InteractiveRuby&#39;&#39; and is a kind of sandbox where you can play around with Ruby at your leisure, \texttt{irb} is launched by entering \texttt{irb} on the shell and ends if your enter \texttt{exit}</pre>
+
+<p>lstset<a href="http://numbers=none,escapechar=&">language=shell,
+style=eclipse} begin{lstlisting</a> $ irb –simple-prompt &gt;&gt; puts
+“Hello World!” Hello World!</p>
+
+<h1 id="label-%3E+nil">&gt; nil<span><a href="#label-%3E+nil">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+
+<p>&gt;&gt; exit end<a href="http://fragile">lstlisting} end{itemize}
+end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Ruby is Object Oriented} begin{frame</a> frametitle{Ruby is <a
+href="Object.html">Object</a> Oriented} begin{itemize}</p>
+
+<pre>\item Ruby only knows objects
+\item Everything is an object
+\item Every object is an instance of a class
+\item An object is encapsulated and can only be reached from the outside via the methods of the corresponding object.
+\item I cannot change any property of an object directly from the outside. The corresponding object has to offer a method with which I can do so</pre>
+
+<p>end{itemize}</p>
+
+<p>end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Methods} begin{frame}[fragile, allowframebreaks]
+frametitle{Methods} begin{block}{Important} alert{Names of methods are
+always written in snake case} end{block}</p>
+
+<p>In other programming languages, the terms you would use for Ruby methods
+would be: functions, procedures, subroutines and of course methods</p>
+
+<p>begin{itemize}</p>
+
+<p>item We want to ouput the string texttt<a href="http://escapechar=&">“Hello
+World!”} three times in a row lstset{language=Ruby, style=eclipse}
+begin{lstlisting</a> # three_times.rb def three_times</p>
+
+<pre>puts &#39;Hello World!&#39;
+puts &#39;Hello World!&#39;
+puts &#39;Hello World!&#39;</pre>
+
+<p>end</p>
+
+<p>three_times end{lstlisting}</p>
+
+<p>lstset{language=shell} begin{lstlisting}[numbers=none, escapechar=&amp;] $
+ruby three_times.rb &amp;outputcommand{Hello World!\ Hello World!\ Hello
+World!}&amp; end{lstlisting}</p>
+
+<p>item You can define parameters and use then within the method</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # three_times.rb def three_times value</p>
+
+<pre>puts value
+puts value
+puts value</pre>
+
+<p>end</p>
+
+<p>three_times &#39;Hello World!&#39; end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=&amp;] $ ruby three_times.rb &amp;outputcommand{Hello World!\
+Hello World!\ Hello World!}&amp; end{lstlisting}</p>
+
+<p>item You can give the variable texttt<a href="http://escapechar=&">value} a
+default value and then you can also call the method without parameter
+lstset{language=Ruby, style=eclipse} begin{lstlisting</a> # three_times.rb
+def three_times value=&#39;Hello World!&#39;</p>
+
+<pre>puts value
+puts value
+puts value</pre>
+
+<p>end</p>
+
+<p>three_times end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=&amp;] $ ruby three_times.rb &amp;outputcommand{Hello World!\
+Hello World!\ Hello World!}&amp; end{lstlisting}</p>
+
+<p>end{itemize}</p>
+
+<p>end<a href="http://fragile">frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+begin{frame</a> frametitle{return} begin{itemize} item Ruby returns the
+value of the last expression as a default begin{columns}</p>
+
+<pre>\column{0.5 \textwidth}
+ \lstset{language=Ruby, style=eclipse}
+ \begin{lstlisting}[escapechar=&amp;]</pre>
+
+<p>def area_of_a_circle radius</p>
+
+<pre>pi = 3.14
+return area = pi * radius * radius</pre>
+
+<p>end</p>
+
+<p>puts area_of_a_circle 10</p>
+
+<pre> \end{lstlisting}
+
+\column{0.5 \textwidth}</pre>
+
+<p>lstset{language=Ruby, style=eclipse}</p>
+
+<pre>\begin{lstlisting}[escapechar=&amp;]</pre>
+
+<p>def area_of_a_circle radius</p>
+
+<pre>pi = 3.14
+area = pi * radius * radius</pre>
+
+<p>end</p>
+
+<p>puts area_of_a_circle 10</p>
+
+<pre>\end{lstlisting}</pre>
+
+<p>end{columns} end{itemize}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=&amp;] $ ruby area_of_a_circle &amp;outputcommand{314.0}&amp;
+end{lstlisting}</p>
+
+<p>end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Classes} begin{frame}[fragile, allowframebreaks]
+frametitle{Classes} begin{block}{Important} alert{The name of a class
+always starts with an upper case letter (Camel Case)} end{block}
+begin{itemize} item <a href="A.html">A</a> class is a collection of methods</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # camel_case.rb class CamelCase</p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">three_times</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Hello World!&#39;</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Hello World!&#39;</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Hello World!&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end</p>
+
+<p>snake_case = CamelCase.new snake_case.three_times end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=&amp;] $ ruby three_times.rb &amp;outputcommand{Hello World!\
+Hello World!\ Hello World!}&amp; end{lstlisting}</p>
+
+<p>end{itemize} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+begin{frame}[fragile, allowframebreaks] frametitle{Private methods}
+begin{itemize} item Quite often it make sense to only call a method within
+its own class or own instance. Such methods are referred to as private
+methods</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # example.rb class <a href="Example.html">Example</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">a</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;a&#39;</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-identifier">private</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">b</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;b&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end</p>
+
+<p>test = Example.new test.a test.b end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=!] $ ruby example.rb !outputcommand{a\ example.rb:15:in
+`&lt;main&gt;&#39;: private method `b&#39; called for
+#&lt;Example:0xa199b3c&gt; (NoMethodError)}! end{lstlisting} end{itemize}
+end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+begin{frame}[fragile, allowframebreaks] frametitle{Method
+texttt{initialize()}} begin{itemize} item If a new instance is created, the
+method that is processed first and automatically is the method
+texttt{initialize}. The method is automatically a private method</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # room.rb class <a href="Room.html">Room</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;abc&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end</p>
+
+<p>kitchen = <a href="Room.html#method-c-new">Room.new</a> kitchen.initialize
+end{lstlisting}</p>
+
+<p>lstset<a href="http://numbers=none, escapechar=!">language=shell,
+style=eclipse} begin{lstlisting</a> # a_b.rb class <a href="A.html">A</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">a</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;a&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end</p>
+
+<p>class <a href="B.html">B</a> &lt; <a href="A.html">A</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">b</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;b&#39;</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end</p>
+
+<p>a = A.new a.a b = B.new b.a b.b a.b end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=!] $ ruby a_b.rb !outputcommand{a\ a\ b\ a_b.rb:21:in
+`&lt;main&gt;&#39;: undefined method `b&#39; for #&lt;A:0x9b258f0&gt;
+(NoMethodError)\}! end{lstlisting} end{itemize} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+begin{frame}[fragile, allowframebreaks] frametitle{Class Methods and
+Instance Methods} begin{itemize} item <a href="A.html">A</a> class method
+method can onl be called in connection with the class item An instance
+method is a method than only works with an instance (you cannot apply the
+method texttt{new} to an instance</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # knowledge.rb class <a
+href="Knowledge.html">Knowledge</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">pi</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-value">3.14</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end knowledge = Knowledge.new knowledge.pi <a
+href="Knowledge.html#method-c-pi">Knowledge.pi</a> end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=!] $ ruby knowledge.rb !outputcommand{3.14\ knowledge.rb:9:in
+`&lt;main&gt;&#39;: undefined method `pi&#39; for Knowledge:Class
+(NoMethodError) }! end{lstlisting}</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # knowledge.rb class <a
+href="Knowledge.html">Knowledge</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">pi</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-value">3.14</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end <a href="Knowledge.html#method-c-pi">Knowledge.pi</a> knowledge =
+Knowledge.new knowledge.pi end{lstlisting}</p>
+
+<p>lstset{language=shell, style=eclipse} begin{lstlisting}[numbers=none,
+escapechar=!] $ ruby knowledge.rb !outputcommand{3.14 knowledge.rb:9:in
+`&lt;main&gt;&#39;: undefined method `pi&#39; for
+#&lt;Knowledge:0x9451c04&gt; (NoMethodError) }! end{lstlisting}</p>
+
+<p>item There are different notations for defining class methods</p>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # knowledge.rb class <a
+href="Knowledge.html">Knowledge</a></p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">self</span>
+  <span class="ruby-keyword">def</span> <span class="ruby-identifier">pi</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-value">3.14</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<p>end <a href="Knowledge.html#method-c-pi">Knowledge.pi</a> knowledge =
+Knowledge.new end<a href="http://fragile">lstlisting} end{itemize}
+end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Variables} begin{frame</a> frametitle{Variables} begin{itemize}</p>
+
+<pre>\item Yoy already know that everything in Ruby is an object. So a variable must also be an object</pre>
+
+<p>end{itemize}</p>
+
+<p>end<a href="http://fragile">frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Naming Conventions} begin{frame</a> frametitle{Naming
+Conventions} begin{block}{Important!} begin{itemize}</p>
+
+<pre>\item Normal variables are written in lower case. Constants start with an upper case letter
+\item A constant can also be overwritten with a new value in Ruby (Do not rely on the constancy of a constant!)</pre>
+
+<p>end{itemize}</p>
+
+<p>end{block}</p>
+
+<p>end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Strings} begin{frame}[fragile, allowframebreaks]
+frametitle{Strings} begin{itemize}</p>
+
+<pre>\item Single Quotations Marks</pre>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # string.rb a = &#39;I am a string&#39; puts a b =
+String.new puts b c = String.new &#39;I am also a string&#39; puts c
+end{lstlisting} lstset{language=shell, style=eclipse}
+begin{lstlisting}[numbers=none, escapechar=!] $ ruby string.rb
+!outputcommand{I am a string\</p>
+
+<p>I am also a string\ }! end{lstlisting}</p>
+
+<pre>\item Doble Quotations Marks</pre>
+
+<p>lstset<a href="http://escapechar=&">language=Ruby, style=eclipse}
+begin{lstlisting</a> # string.rb a = &#39;blue&#39; puts “Color #{a}”
+end{lstlisting} lstset{language=shell, style=eclipse}
+begin{lstlisting}[numbers=none, escapechar=!] $ ruby string.rb
+!outputcommand{I am a string\</p>
+
+<p>I am also a string\ }! end<a href="http://fragile">lstlisting} end{itemize}
+end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Integers} begin{frame</a> frametitle<a
+href="http://fragile">Integers} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Floats} begin{frame</a> frametitle<a
+href="http://fragile">Floats} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Boolean Values and texttt{nil}} begin{frame</a> frametitle<a
+href="http://fragile">Boolean Values and texttt{nil}} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Scope of Variables} begin{frame</a> frametitle<a
+href="http://fragile">Boolean Values and nil} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Methods Once Again} begin{frame</a> frametitle<a
+href="http://fragile">Methods Once Again} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Getters and Setters} begin{frame</a> frametitle<a
+href="http://fragile">Getters and Setters} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Build-In Methods for Strings} begin{frame</a> frametitle<a
+href="http://fragile">Build-In Methods for Strings} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Method Chaining} begin{frame</a> frametitle<a
+href="http://fragile">Method Chaining} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Method texttt{to string} for Your Own Classes} begin{frame</a>
+frametitle<a href="http://fragile">Method texttt{to string} for Your Own
+Classes} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Is ”+” a Method?} begin{frame</a> frametitle<a
+href="http://fragile">Is ”+” a Method?} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{if-Condition} begin{frame</a> frametitle<a
+href="http://fragile">if-Condition} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Loops} begin{frame</a> frametitle<a href="http://fragile">Loops}
+end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{While and until} begin{frame</a> frametitle<a
+href="http://fragile">While and until} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Block and Iterators} begin{frame</a> frametitle<a
+href="http://fragile">Block and Iterators} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subsection{Array and Hashes} begin{frame</a> frametitle<a
+href="http://fragile">Array and Hashes} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+section{Miscellaneous} begin{frame</a> frametitle{Miscellaneous} end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</p>
+
+<p>end{document}</p>
+
+</div>
+
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.0.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

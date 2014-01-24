@@ -1,0 +1,103 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{multirow}
+
+\usepackage{listings}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+\newcommand{\comment}[2]{#2}
+
+
+\title[Learning Android]{Learning Android}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca]{Carmelo Cuenca-Hernández}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}
+	\frametitle{Outline}
+	%\tableofcontents%[part=1,pausesections]
+%\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+
+\selectlanguage{british}
+
+
+
+%\include{android-overview}
+%\include{android-user-interface}
+%\include{preferences}
+\include{services}
+\include{database}
+
+\comment{
+\section{List and Adapters}
+
+\section{Broadcast Receeivers}
+
+\section{Content Providers}
+
+\section{System Services}
+
+\section{The Android Interface Definition Language}
+}
+
+\begin{frame}
+\frametitle{Start Up }
+\begin{enumerate}
+\item Gitttwitter
+\begin{enumerate}
+\item \texttt{git clone git://github.com/carmelocuenca/Yamba.git}
+\item \texttt{git log --pretty=oneline}
+\item \texttt{git reset --hard d9938feab266bc4cbef4c4c8b4fa2541be000e87} OnClickListner Commit
+\end{enumerate}
+\item Starting the Yamba Project. \texttt{File|New Project|Other\dots|Android Application Project}\dots
+\item Copy all files \dots from repository to workspace
+\item Don't forget \texttt{.gitignore} \texttt{.git} to \texttt{workspace/Yamba}
+\end{enumerate}
+\end{frame}
+
+
+\end{document}

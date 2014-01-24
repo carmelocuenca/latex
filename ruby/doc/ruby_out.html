@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>ruby.out - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body class="file">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./doc/created_rid.html">created.rid</a>
+  
+    <li class="file"><a href="./lstcustom_sty.html">lstcustom.sty</a>
+  
+    <li class="file"><a href="./lstcustom_sty_backup.html">lstcustom.sty.backup</a>
+  
+    <li class="file"><a href="./lstcustom_sty~.html">lstcustom.sty~</a>
+  
+    <li class="file"><a href="./ruby_acn.html">ruby.acn</a>
+  
+    <li class="file"><a href="./ruby_aux.html">ruby.aux</a>
+  
+    <li class="file"><a href="./ruby_glo.html">ruby.glo</a>
+  
+    <li class="file"><a href="./ruby_glsdefs.html">ruby.glsdefs</a>
+  
+    <li class="file"><a href="./ruby_log.html">ruby.log</a>
+  
+    <li class="file"><a href="./ruby_nav.html">ruby.nav</a>
+  
+    <li class="file"><a href="./ruby_out.html">ruby.out</a>
+  
+    <li class="file"><a href="./ruby_snm.html">ruby.snm</a>
+  
+    <li class="file"><a href="./ruby_tex.html">ruby.tex</a>
+  
+    <li class="file"><a href="./ruby_tex_backup.html">ruby.tex.backup</a>
+  
+    <li class="file"><a href="./ruby_tex~.html">ruby.tex~</a>
+  
+    <li class="file"><a href="./ruby_toc.html">ruby.toc</a>
+  
+    <li class="file"><a href="./ruby_vrb.html">ruby.vrb</a>
+  
+    <li class="file"><a href="./ruby_xdy.html">ruby.xdy</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./A.html">A</a>
+  
+    <li><a href="./B.html">B</a>
+  
+    <li><a href="./Example.html">Example</a>
+  
+    <li><a href="./Knowledge.html">Knowledge</a>
+  
+    <li><a href="./Object.html">Object</a>
+  
+    <li><a href="./Room.html">Room</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation" class="description">
+  
+<p>BOOKMARK [2][]{Outline0.2}{Ruby}{}% 1 BOOKMARK [2][]{Outline0.3}{Setting Up
+Ruby Environment}{}% 2 BOOKMARK [2][]{Outline0.4}{Hello World!}{}% 3
+BOOKMARK [2][]{Outline0.5}{irb}{}% 4 BOOKMARK [2][]{Outline0.6}{Ruby is <a
+href="Object.html">Object</a> Oriented}{}% 5 BOOKMARK
+[3][]{Outline0.6.1.8}{Methods}{Outline0.6}% 6 BOOKMARK
+[3][]{Outline0.6.2.13}{Classes}{Outline0.6}% 7 BOOKMARK
+[2][]{Outline0.7}{Variables}{}% 8 BOOKMARK [3][]{Outline0.7.1.25}{Naming
+Conventions}{Outline0.7}% 9 BOOKMARK
+[3][]{Outline0.7.2.26}{Strings}{Outline0.7}% 10 BOOKMARK
+[3][]{Outline0.7.3.27}{Integers}{Outline0.7}% 11 BOOKMARK
+[3][]{Outline0.7.4.28}{Floats}{Outline0.7}% 12 BOOKMARK
+[3][]{Outline0.7.5.29}{Boolean Values and nil}{Outline0.7}% 13 BOOKMARK
+[3][]{Outline0.7.6.30}{Scope of Variables}{Outline0.7}% 14 BOOKMARK
+[2][]{Outline0.8}{Methods Once Again}{}% 15 BOOKMARK
+[3][]{Outline0.8.1.32}{Getters and Setters}{Outline0.8}% 16 BOOKMARK
+[3][]{Outline0.8.2.33}{Build-In Methods for Strings}{Outline0.8}% 17
+BOOKMARK [3][]{Outline0.8.3.34}{Method Chaining}{Outline0.8}% 18 BOOKMARK
+[3][]{Outline0.8.4.35}{Method to string for Your Own Classes}{Outline0.8}%
+19 BOOKMARK [3][]{Outline0.8.5.36}{Is &#39;&#39;+&#39;&#39; a
+Method?}{Outline0.8}% 20 BOOKMARK [2][]{Outline0.9}{if-Condition}{}% 21
+BOOKMARK [2][]{Outline0.10}{Loops}{}% 22 BOOKMARK
+[3][]{Outline0.10.1.39}{While and until}{Outline0.10}% 23 BOOKMARK
+[3][]{Outline0.10.2.40}{Block and Iterators}{Outline0.10}% 24 BOOKMARK
+[3][]{Outline0.10.3.41}{Array and Hashes}{Outline0.10}% 25 BOOKMARK
+[2][]{Outline0.11}{Miscellaneous}{}% 26</p>
+
+</div>
+
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.0.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

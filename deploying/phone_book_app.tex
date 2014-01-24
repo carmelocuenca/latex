@@ -1,0 +1,230 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{hyperref}
+%\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{multirow}
+
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstloadlanguages{Ruby}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{amsmath}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+
+\newcommand{\comment}[2]{#2}
+
+\newcommand{\commandinline}[1]{\lstinline[basicstyle=\small\lstfontfamily]{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+\graphicspath{ {./images/} }
+
+\title{Deploying a Ruby on Rails Application in an Amazon EC2 Virtual Machine}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{./images/logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{./images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\selectlanguage{british}
+
+\begin{document}
+
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  \tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  %\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+%\input{../glossary}
+
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{css}{CSS}{cascading style sheets}
+\newacronym{ebs}{EBS}{Elastic Block Storage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section*{Web Server in Production Mode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Setting Up a Rails Project}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Setting Up a Rails Project}
+\begin{itemize}
+\item To keep this presentation as simple as possible, we clone an example applicacion in the \texttt{public\_html} directory 
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ cd ~/public_html
+$ rvm ruby-2.0.0-p353@railstutorial_rails_4_0 --create
+$ gem install rails --version=4.0.0
+$ rails new depot_app -d postgresql
+\end{lstlisting}
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ cd ~/depot_app
+$ rails generate scaffold company name:string
+$ rails generate scaffold employee company_id:integer last_name:string first_name:string phone_number:string
+\end{lstlisting}
+
+# This file should contain all the record creation needed to seed the database with its default values.
+# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
+#
+# Examples:
+#
+#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
+#   Mayor.create(name: 'Emanuel', city: cities.first)
+
+30.times do
+  company = Company.new name: Faker::Company.name
+  if company.save
+    SecureRandom::random_number(100).times do
+      company.employees.create first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        phone_number: Faker::PhoneNumber.phone_number
+    end
+  end
+end
+
+la linea en Gemfile gem 'faker'
+
+bundle install
+
+rake db:create
+rake db:migrate
+
+Editar los ficheros de los modelos
+
+class Company < ActiveRecord::Base
+  has_many :employees, dependent: :destroy
+
+  validates :name,
+    presence: true,
+    uniqueness: true
+
+  def to_s
+    name
+  end
+
+end
+
+class Employee < ActiveRecord::Base
+
+  belongs_to :company, touch: true
+
+  validates :first_name,
+    presence: true
+  validates :last_name,
+    presence: true
+  validates :company,
+    presence: true
+
+  def to_s
+    "#{first_name} #{last_name}"
+  end
+
+end
+
+rails generate scaffold employee last_name:string first_name:string phone_number:string
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @company.name %>
+</p>
+
+<%= link_to 'Edit', edit_company_path(@company) %> |
+<%= link_to 'Back', companies_path %>
+
+<h1>Listing employees</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Last Name</th>
+      <th>Fist Name</th>
+      <th>Phone Number</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @company.employees.each do |employee|%>
+      <tr>
+        <td><%= employee.last_name %></td>
+        <td><%= employee.first_name %></td>
+        <td><%= employee.phone_number %></td>
+      </tr>
+    <% end%>
+  </tbody>
+</table>
+
+
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

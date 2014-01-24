@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>ruby.xdy - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body class="file">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./doc/created_rid.html">created.rid</a>
+  
+    <li class="file"><a href="./lstcustom_sty.html">lstcustom.sty</a>
+  
+    <li class="file"><a href="./lstcustom_sty_backup.html">lstcustom.sty.backup</a>
+  
+    <li class="file"><a href="./lstcustom_sty~.html">lstcustom.sty~</a>
+  
+    <li class="file"><a href="./ruby_acn.html">ruby.acn</a>
+  
+    <li class="file"><a href="./ruby_aux.html">ruby.aux</a>
+  
+    <li class="file"><a href="./ruby_glo.html">ruby.glo</a>
+  
+    <li class="file"><a href="./ruby_glsdefs.html">ruby.glsdefs</a>
+  
+    <li class="file"><a href="./ruby_log.html">ruby.log</a>
+  
+    <li class="file"><a href="./ruby_nav.html">ruby.nav</a>
+  
+    <li class="file"><a href="./ruby_out.html">ruby.out</a>
+  
+    <li class="file"><a href="./ruby_snm.html">ruby.snm</a>
+  
+    <li class="file"><a href="./ruby_tex.html">ruby.tex</a>
+  
+    <li class="file"><a href="./ruby_tex_backup.html">ruby.tex.backup</a>
+  
+    <li class="file"><a href="./ruby_tex~.html">ruby.tex~</a>
+  
+    <li class="file"><a href="./ruby_toc.html">ruby.toc</a>
+  
+    <li class="file"><a href="./ruby_vrb.html">ruby.vrb</a>
+  
+    <li class="file"><a href="./ruby_xdy.html">ruby.xdy</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./A.html">A</a>
+  
+    <li><a href="./B.html">B</a>
+  
+    <li><a href="./Example.html">Example</a>
+  
+    <li><a href="./Knowledge.html">Knowledge</a>
+  
+    <li><a href="./Object.html">Object</a>
+  
+    <li><a href="./Room.html">Room</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation" class="description">
+  
+<p>;; xindy style file created by the glossaries package ;; for document
+&#39;ruby&#39; on 2014-1-19</p>
+
+<p>; required styles</p>
+
+<p>(require “tex.xdy”)</p>
+
+<p>; list of allowed attributes (number formats)</p>
+
+<p>(define-attributes ((“default”</p>
+
+<pre>&quot;glsnumberformat&quot; 
+&quot;pageglsnumberformat&quot;
+&quot;textrm&quot; 
+&quot;pagetextrm&quot;
+&quot;textsf&quot; 
+&quot;pagetextsf&quot;
+&quot;texttt&quot; 
+&quot;pagetexttt&quot;
+&quot;textbf&quot; 
+&quot;pagetextbf&quot;
+&quot;textmd&quot; 
+&quot;pagetextmd&quot;
+&quot;textit&quot; 
+&quot;pagetextit&quot;
+&quot;textup&quot; 
+&quot;pagetextup&quot;
+&quot;textsl&quot; 
+&quot;pagetextsl&quot;
+&quot;textsc&quot; 
+&quot;pagetextsc&quot;
+&quot;emph&quot; 
+&quot;pageemph&quot;
+&quot;glshypernumber&quot; 
+&quot;pageglshypernumber&quot;
+&quot;hyperrm&quot; 
+&quot;pagehyperrm&quot;
+&quot;hypersf&quot; 
+&quot;pagehypersf&quot;
+&quot;hypertt&quot; 
+&quot;pagehypertt&quot;
+&quot;hyperbf&quot; 
+&quot;pagehyperbf&quot;
+&quot;hypermd&quot; 
+&quot;pagehypermd&quot;
+&quot;hyperit&quot; 
+&quot;pagehyperit&quot;
+&quot;hyperup&quot; 
+&quot;pagehyperup&quot;
+&quot;hypersl&quot; 
+&quot;pagehypersl&quot;
+&quot;hypersc&quot; 
+&quot;pagehypersc&quot;
+&quot;hyperemph&quot; 
+&quot;pagehyperemph&quot;)))</pre>
+
+<p>; user defined alphabets</p>
+
+<p>; location class definitions</p>
+
+<p>(define-location-class “roman-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-Roman-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-arabic-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;alpha&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-Alpha-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-Appendix-page-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “roman-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot;  :sep &quot;\protect \es@scroman  {&quot; &quot;roman-numbers-lowercase&quot; :sep &quot;}&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Roman-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;roman-numbers-uppercase&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “alpha-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;alpha&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Alpha-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “Appendix-page-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;ALPHA&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)  (define-location-class “arabic-section-numbers-arabic-section-numbers”</p>
+
+<pre>( :sep &quot;{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}{&quot; &quot;arabic-numbers&quot; :sep &quot;.&quot; &quot;arabic-numbers&quot; :sep &quot;}&quot; ) 
+:min-range-length 2</pre>
+
+<p>)</p>
+
+<p>; user defined location classes</p>
+
+<p>; define cross-reference class</p>
+
+<p>(define-crossref-class “see” :unverified ) (markup-crossref-list :class
+“see”</p>
+
+<pre>:open &quot;\glsseeformat&quot; :close &quot;{}&quot;)</pre>
+
+<p>; define the order of the location classes (define-location-class-order (</p>
+
+<pre>&quot;roman-page-numbers&quot;
+&quot;arabic-page-numbers&quot;
+&quot;arabic-section-numbers&quot;
+&quot;alpha-page-numbers&quot;
+&quot;Roman-page-numbers&quot;
+&quot;Alpha-page-numbers&quot;
+&quot;Appendix-page-numbers&quot; 
+&quot;see&quot; ))</pre>
+
+<p>; define the glossary markup</p>
+
+<p>(markup-index</p>
+
+<pre>:open &quot;\glossarysection[\glossarytoctitle]{\glossarytitle}\glossarypreamble</pre>
+
+<p>providecommand*glsXpageXglsnumberformat[2]{<a
+href=“#1”>setentrycounter</a>{page}glsnumberformat{#2}}
+providecommand*glsXpageXtextrm[2]{<a
+href=“#1”>setentrycounter</a>{page}textrm{#2}}
+providecommand*glsXpageXtextsf[2]{<a
+href=“#1”>setentrycounter</a>{page}textsf{#2}}
+providecommand*glsXpageXtexttt[2]{<a
+href=“#1”>setentrycounter</a>{page}texttt{#2}}
+providecommand*glsXpageXtextbf[2]{<a
+href=“#1”>setentrycounter</a>{page}textbf{#2}}
+providecommand*glsXpageXtextmd[2]{<a
+href=“#1”>setentrycounter</a>{page}textmd{#2}}
+providecommand*glsXpageXtextit[2]{<a
+href=“#1”>setentrycounter</a>{page}textit{#2}}
+providecommand*glsXpageXtextup[2]{<a
+href=“#1”>setentrycounter</a>{page}textup{#2}}
+providecommand*glsXpageXtextsl[2]{<a
+href=“#1”>setentrycounter</a>{page}textsl{#2}}
+providecommand*glsXpageXtextsc[2]{<a
+href=“#1”>setentrycounter</a>{page}textsc{#2}}
+providecommand*glsXpageXemph[2]{<a
+href=“#1”>setentrycounter</a>{page}emph{#2}}
+providecommand*glsXpageXglshypernumber[2]{<a
+href=“#1”>setentrycounter</a>{page}glshypernumber{#2}}
+providecommand*glsXpageXhyperrm[2]{<a
+href=“#1”>setentrycounter</a>{page}hyperrm{#2}}
+providecommand*glsXpageXhypersf[2]{<a
+href=“#1”>setentrycounter</a>{page}hypersf{#2}}
+providecommand*glsXpageXhypertt[2]{<a
+href=“#1”>setentrycounter</a>{page}hypertt{#2}}
+providecommand*glsXpageXhyperbf[2]{<a
+href=“#1”>setentrycounter</a>{page}hyperbf{#2}}
+providecommand*glsXpageXhypermd[2]{<a
+href=“#1”>setentrycounter</a>{page}hypermd{#2}}
+providecommand*glsXpageXhyperit[2]{<a
+href=“#1”>setentrycounter</a>{page}hyperit{#2}}
+providecommand*glsXpageXhyperup[2]{<a
+href=“#1”>setentrycounter</a>{page}hyperup{#2}}
+providecommand*glsXpageXhypersl[2]{<a
+href=“#1”>setentrycounter</a>{page}hypersl{#2}}
+providecommand*glsXpageXhypersc[2]{<a
+href=“#1”>setentrycounter</a>{page}hypersc{#2}}
+providecommand*glsXpageXhyperemph[2]{<a
+href=“#1”>setentrycounter</a>{page}hyperemph{#2}}
+begin{theglossary}glossaryheader~n“</p>
+
+<pre>:close &quot;%~n\end{theglossary}\glossarypostamble~n&quot; 
+:tree)</pre>
+
+<p>(markup-letter-group-list :sep “glsgroupskip~n”) (markup-indexentry :open
+“relaxglsresetentrylist~n”) (markup-locclass-list :open
+“{glossaryentrynumbers{relax ”</p>
+
+<pre>:sep &quot;, &quot; :close &quot;}}&quot;)</pre>
+
+<p>(markup-locref-list :sep “delimN ”) (markup-range :sep “delimR ”)</p>
+
+<p>; define format to use for locations</p>
+
+<p>(markup-locref :open “~nglsXpageXglsnumberformat”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pageglsnumberformat&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextrm”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextrm&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextsf”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextsf&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtexttt”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetexttt&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextbf”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextbf&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextmd”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextmd&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextit”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextit&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextup”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextup&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextsl”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextsl&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXtextsc”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagetextsc&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXemph”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pageemph&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXglshypernumber”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pageglshypernumber&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhyperrm”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehyperrm&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhypersf”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehypersf&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhypertt”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehypertt&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhyperbf”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehyperbf&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhypermd”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehypermd&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhyperit”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehyperit&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhyperup”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehyperup&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhypersl”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehypersl&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhypersc”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehypersc&quot;)</pre>
+
+<p>(markup-locref :open “~nglsXpageXhyperemph”</p>
+
+<pre>:close &quot;&quot; 
+:attr &quot;pagehyperemph&quot;)</pre>
+
+<p>; define letter group list format</p>
+
+<p>(markup-letter-group-list :sep “glsgroupskip~n”)</p>
+
+<p>; letter group headings</p>
+
+<p>(markup-letter-group :open-head “glsgroupheading{”</p>
+
+<pre>:close-head &quot;}&quot;)</pre>
+
+<p>; additional letter groups</p>
+
+<p>(define-letter-group “glsnumbers”</p>
+
+<pre>:prefixes (&quot;0&quot; &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot; &quot;6&quot; &quot;7&quot; &quot;8&quot; &quot;9&quot;)
+:before &quot;A&quot;)</pre>
+
+<p>; additional sort rules</p>
+
+</div>
+
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.0.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

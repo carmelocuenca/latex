@@ -1,0 +1,263 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Setting Up a New Rails Project - Option 1}
+\begin{frame}[fragile]
+\frametitle{Setting Up a New Rails Project}
+To keep this guide as simple as possible, we crate a simple blog in the home directory of the user \texttt{blog\_app}
+
+Install \acrshort{ror}
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ gem install rails --version=4.0.0
+\end{lstlisting}
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ rails new blog_app -d postgresql
+$ cd blog_app
+$ rails generate scaffold post subject:string content:text
+!\outputcommand{A lot of stuff}!
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Adapting Gemfile}
+\begin{frame}[fragile]
+\frametitle{Adapting Gemfile}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+# Gemfile
+!\vdots!
+gem 'unicorn', group: :production
+!\vdots!
+\end{lstlisting}
+
+Then install gems via \texttt{bundler install}
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ bundle install
+\end{lstlisting}
+ 
+To get a root URL we change to \texttt{config/routes.rb} file to this
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+BlogApp::Application.routes.draw do
+  resources :post
+  root 'posts#index'
+end
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Production Database Configuration}
+\begin{frame}[fragile]
+\frametitle{Production Database Configuration}
+Edit the database configuration file \texttt{config/database.yml}
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+development:
+!\vdots!
+  username: blog_app
+  password: 123456
+!\vdots!
+production:
+!\vdots!
+  username: blog_app
+  password: 123456
+!\vdots!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{rake db:migrate \dots}
+\begin{frame}[fragile]
+\frametitle{rake db:migrate \dots}
+We still need to create the databases
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ rake db:migrate
+$ rake db:setup RAILS_ENV=production
+\end{lstlisting}
+
+Start the rails server and visit the root url
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ unicorn -p 5000 -E production
+$ curl http://localhost:5000
+\end{lstlisting}
+
+Stop the rails sever
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsubsection{Unicorn Configuration}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Unicorn Configuration}
+
+To be able to start Unicorn with \acrshort{rvm} environment from an \texttt{init.d} script, we now need generate a corresponding wrapper
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ rvm wrapper 2.0.0 bootup unicorn
+!\outputcommand{Regenerating 2.0.0 wrappers.}!
+\end{lstlisting}
+
+Download \href{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}
+and save as \texttt{config/unicorn.rb}. Then edit the unicorn configuration file \texttt{config/unicorn.rb}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+# config/unicorn.rb
+# !\circled{1}!
+# https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb
+!\vdots!
+# user "unprivileged_user", "unprivileged_group"
+# !\circled{2}!
+user "deployer", "deployer"
+
+# Help ensure your application will always spawn in the symlinked
+# "current" directory that Capistrano sets up.
+# !\circled{3}!
+# working_directory "/path/to/app/current" # available in 0.94.0+
+APP_PATH = "/home/deployer/blog_app"
+working_directory APP_PATH # available in 0.94.0+
+
+# listen on both a Unix domain socket and a TCP port,
+# we use a shorter backlog for quicker failover when busy
+# !\circled{3}!
+# listen "/path/to/.unicorn.sock", :backlog => 64
+listen "/tmp/.unicorn_blog_app.sock", :backlog => 64
+listen 8080, :tcp_nopush => true
+
+# nuke workers after 30 seconds instead of 60 seconds (the default)
+timeout 30
+
+# feel free to point this anywhere accessible on the filesystem
+# !\circled{4}!
+# pid "/path/to/app/shared/pids/unicorn.pid"
+pid "/var/run/unicorn_blog_app.pid"
+
+# By default, the Unicorn logger will write to stderr.
+# Additionally, ome applications/frameworks log to stderr or stdout,
+# so prevent them from going to /dev/null when daemonized here:
+# !\circled{4}!
+# stderr_path "/path/to/app/shared/log/unicorn.stderr.log"
+# stdout_path "/path/to/app/shared/log/unicorn.stdout.log"
+stderr_path APP_PATH + "/log/unicorn_blog_app.stderr.log"
+stdout_path APP_PATH + "/log/unicorn_blog_app.stdout.log"
+!\vdots!                                                                      
+\end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Unicorn Init Script}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Unicorn Init Script}
+
+Create the init script \texttt{/etc/init.d/unicorn\_blog\_app}
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+#/bin/bash
+
+### BEGIN INIT INFO
+# Provide:              unicorn
+# Required-Start:       $remote_fs $syslog
+# Required-Stop:        $remote_fs $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Unicorn webserver
+# Description:          Unicorn webserver for blog_app
+### END INIT INFO
+
+UNICORN=/home/deployer/.rvm/bin/bootup_unicorn
+UNICORN_ARGS="-D -c /home/deployer/blog_app/config/unicorn.rb -p 5000 -E production"
+KILL=/bin/kill
+PID=/var/run/unicorn_blog_app.pid
+
+sig() {
+  test -s "$PID" && kill -$1 `cat $PID`
+}
+
+case "$1" in
+  start)
+    echo "Starting unicorn..."
+    $UNICORN $UNICORN_ARGS
+    ;;
+  stop)
+    echo "Stoping unicorn..."
+    sig QUIT & exit 0
+    echo >&2 "Not running"
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+esac             
+\end{lstlisting}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\texttt{/etc/hosts}}
+\begin{frame}[fragile]
+\frametitle{\texttt{/etc/hosts}}
+Edit \texttt{/etc/hosts} with the following content in order to resolve the server \texttt{blog\_app.com}
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+127.0.0.1   blog_app.com # !\circled{1}!
+\end{lstlisting}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Apache Configuration}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Apache Configuration}
+
+Add a Virtual Host in Apache configuration file \texttt{/etc/httpd/conf/httpd.conf}
+
+\lstset{language=shell, escapechar=&}
+\begin{lstlisting}
+&\vdots&
+&\circled{1}&
+NameVirtualHost *:80
+&\vdots&
+&\circled{2}&
+<VirtualHost *:80>
+  ServerAdmin webmaster@blog_app.com
+  DocumentRoot /home/deployer/blog_app
+  ServerName blog_app.com
+  ErrorLog logs/blog_app.example.com-error_log
+  CustomLog logs/blog_app.example.com-access_log common
+
+  RewriteEngine On
+
+# Redirect all non-static requests to unicorn
+  RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f 
+  RewriteRule ^/(.*)$ http://127.0.0.1:5000%{REQUEST_URI} [P,QSA,L]
+</VirtualHost>
+\end{lstlisting}
+
+
+Restart Apache daemon
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+# /etc/init.d/httpd restart
+\end{lstlisting}
+
+\end{frame}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
