@@ -1,0 +1,135 @@
+[carmelo.cuenca@ponderosa ~]$ ab -c 1 -n 60 http://ec2-75-101-132-37.compute-1.amazonaws.com/
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking ec2-75-101-132-37.compute-1.amazonaws.com (be patient).....done
+
+
+Server Software:
+Server Hostname:        ec2-75-101-132-37.compute-1.amazonaws.com
+Server Port:            80
+
+Document Path:          /
+Document Length:        85450 bytes
+
+Concurrency Level:      1
+Time taken for tests:   92.713 seconds
+Complete requests:      60
+Failed requests:        0
+Write errors:           0
+Total transferred:      5177820 bytes
+HTML transferred:       5127000 bytes
+Requests per second:    0.65 [#/sec] (mean)
+Time per request:       1545.215 [ms] (mean)
+Time per request:       1545.215 [ms] (mean, across all concurrent requests)
+Transfer rate:          54.54 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      176  194  31.1    187     374
+Processing:  1215 1351 223.9   1308    2886
+Waiting:      338  459 210.3    418    1890
+Total:       1394 1545 231.2   1495    3067
+
+Percentage of the requests served within a certain time (ms)
+  50%   1495
+  66%   1532
+  75%   1545
+  80%   1584
+  90%   1692
+  95%   1856
+  98%   1982
+  99%   3067
+ 100%   3067 (longest request)
+
+
+[carmelo.cuenca@ponderosa ~]$ ab -c 1 -n 60 http://depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com/
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com (be patient).....done
+
+
+Server Software:
+Server Hostname:        depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com
+Server Port:            80
+
+Document Path:          /
+Document Length:        85449 bytes
+
+Concurrency Level:      1
+Time taken for tests:   98.747 seconds
+Complete requests:      60
+Failed requests:        0
+Write errors:           0
+Total transferred:      5177760 bytes
+HTML transferred:       5126940 bytes
+Requests per second:    0.61 [#/sec] (mean)
+Time per request:       1645.778 [ms] (mean)
+Time per request:       1645.778 [ms] (mean, across all concurrent requests)
+Transfer rate:          51.21 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      179  192  16.6    190     305
+Processing:  1253 1454 208.8   1411    2868
+Waiting:      378  465 154.6    443    1539
+Total:       1435 1646 210.6   1600    3058
+
+Percentage of the requests served within a certain time (ms)
+  50%   1600
+  66%   1633
+  75%   1670
+  80%   1715
+  90%   1768
+  95%   1870
+  98%   1972
+  99%   3058
+ 100%   3058 (longest request)
+[carmelo.cuenca@ponderosa ~]$ ab -c 2 -n 60 http://depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com/
+This is ApacheBench, Version 2.3 <$Revision: 655654 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com (be patient).....done
+
+
+Server Software:
+Server Hostname:        depot-app-load-balancer-477634576.us-east-1.elb.amazonaws.com
+Server Port:            80
+
+Document Path:          /
+Document Length:        85449 bytes
+
+Concurrency Level:      2
+Time taken for tests:   69.936 seconds
+Complete requests:      60
+Failed requests:        0
+Write errors:           0
+Total transferred:      5177760 bytes
+HTML transferred:       5126940 bytes
+Requests per second:    0.86 [#/sec] (mean)
+Time per request:       2331.184 [ms] (mean)
+Time per request:       1165.592 [ms] (mean, across all concurrent requests)
+Transfer rate:          72.30 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:      179  194  18.4    192     319
+Processing:  1846 2132 191.8   2133    2755
+Waiting:      407  604 160.9    579    1177
+Total:       2043 2326 192.2   2328    2959
+
+Percentage of the requests served within a certain time (ms)
+  50%   2328
+  66%   2356
+  75%   2395
+  80%   2410
+  90%   2543
+  95%   2824
+  98%   2879
+  99%   2959
+ 100%   2959 (longest request)
+

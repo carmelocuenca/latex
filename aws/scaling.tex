@@ -100,21 +100,40 @@
    \item A desktop or laptop (with Internet access, of course)
    \item A credit card (for setting up an AWS account)
    \item A phone (to complete the registration process)
+   \item \acrfull{rds}, \acrfull{elb}, \acrfull{ami}, CloudWatch, AutoScaling 
  \end{itemize}
 \end{itemize}
-\begin{center}
-\includegraphics[scale=0.6]{scale.eps}
-\end{center}
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]
+\begin{frame}[fragile, allowframebreaks]
 \frametitle{Choosing an Architecture}
+
+\begin{columns}
+\column{0.5 \textwidth}
+
+\begin{center}
+\includegraphics[scale=0.20]{Programming_Amazon_EC2-013.eps}      
+\end{center}
+\column{0.5 \textwidth}
+\begin{center}
+\includegraphics[scale=0.45]{scale.eps}
+\end{center}
+\end{columns}
+
 \begin{itemize}
  \item We have a standard, three-tiered application, consisting of a database, an application server, and a web server
+ \item Scaling considerations
+ \begin{itemize}
+   \item You cannot guarantee that the load balancer will redirect subsequents request from the same user to the same \acrshort{ec2} instance
+   \item Ephemeral Filesystems. The current state of the filesystem can be assumed to last only as long a single resquest (File Uploads?)
+   \item Embedded Databases store their data in a file on the local filesystem
+   \item Caching (MemCache, REDIS \dots...)
+   \item Storing Static Assets
+ \end{itemize}
 \end{itemize}
-\begin{center}
-\includegraphics[scale=0.20]{Programming_Amazon_EC2-013.eps}
-\end{center}
+
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RDS Database}
@@ -126,7 +145,8 @@
  \item \acrshort{rds} gives you access to the capabilities of a familiar \texttt{MySQL}, \texttt{Oracle}, \texttt{Microsoft SQL Server}, or \texttt{PostgreSQL} database engine
 \end{itemize}
 \begin{center}
-      \includegraphics[scale=0.25]{rds.eps}
+
+\includegraphics[scale=0.25]{rds.eps}
 \end{center}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -236,6 +256,20 @@ $ curl http://my.public.dns.amazonaws.com:5000
  \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Web Server Benchmarking}
+\begin{frame}[fragile]
+\frametitle{Web Server Benchmarking}
+\begin{itemize}
+  \item Web Sites \url{WebPageTest.org}
+  \item Apache  \texttt{JMeter}
+  \item Tools \texttt{httperf}, \texttt{ab} (Apache Bench)
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ab -n request -c concurrency [http[s]://]hostname[:port]/path
+\end{lstlisting}
+   \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Testing a Web Application}
 \begin{itemize}
@@ -244,14 +278,14 @@ $ curl http://my.public.dns.amazonaws.com:5000
 \begin{lstlisting}[escapechar=!]
 # tail -f /var/log/httpd/depot_app*
 \end{lstlisting}
-\includegraphics[scale=0.25]{logapache.eps}
+\includegraphics[scale=0.15]{logapache.eps}
 
-\item Tail the Unicorn ( )log files as \texttt{depot\_app} in \acrshort{ec2} in order to check Unicorn Server
+\item Tail the Unicorn log files as \texttt{depot\_app} in \acrshort{ec2} in order to check Unicorn Server
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ tail -f log/production.log log/unicorn.std*
 \end{lstlisting}
-\includegraphics[scale=0.25]{lograils.eps}
+\includegraphics[scale=0.15]{lograils.eps}
 
 \item Run Apache Bench \texttt{ab} in order to stress the Web Site
 
@@ -267,7 +301,9 @@ This is ApacheBench, Version 2.0.40-dev <$Revision: 1.146 $> apache-2.0
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Copyright 2006 The Apache Software Foundation, http://www.apache.org/
 
-Benchmarking depot_app.com (be patient).....done
+Benchmarking depot_app.com (be patient).
+   
+....done
 
 
 Server Software:
@@ -309,16 +345,16 @@ Percentage of the requests served within a certain time (ms)
 
 \end{lstlisting}
 
+\item Monitoring CloudWatch metrics in the ``Monitoring Tab''
 
 \end{itemize}
-
+\begin{center}
+\includegraphics[width=0.75 \textwidth]{cpuutilization.png}
+\end{center}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{S3/CloudFront}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Amazon Machine Image (AMI)}
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Amazon Machine Image (AMI)}
@@ -333,7 +369,7 @@ Percentage of the requests served within a certain time (ms)
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Creating Your Own \acrshort{ami}}
 \begin{enumerate}
-\item In order to distinguish between \acrshort{ec2} machines change the application layout (as user \texttt{depot\_app} )
+\item In order to distinguish between \acrshort{ec2} machines we have written in the application layout (as user \texttt{depot\_app} )
 
 \lstset{language=html, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -376,39 +412,42 @@ result, an \acrshort{elb} is not referenced by an IP address, but by a fully qua
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Creating a ELB}
-\begin{center}
-\includegraphics[scale=0.2]{readytocreate.eps}
-\framebreak
-\end{center}
 \begin{enumerate}	
+\item Summary
+\begin{center}
+\includegraphics[scale=0.3]{createaelb2.png}
+\end{center}
 \item Define Load Balancer
 \begin{center}
-\includegraphics[scale=0.2]{createaelb0.eps}
-\end{center}
+\includegraphics[scale=0.3]{readytocreate.png}
+\end{center}	
 \item Configure Health Check
 \begin{center}
-\includegraphics[scale=0.2]{createaelb.eps}
-\end{center}	
+\includegraphics[scale=0.3]{createaelb0.png}
+\end{center}
 \item Add \acrshort{ec2} instances
+\begin{center}
+\includegraphics[scale=0.3]{createaelb1.png}
+\end{center}	
 \item Review
 \end{enumerate}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]
+\begin{frame}[fragile]
 \frametitle{Testing a ELB}
 \
-\begin{enumerate}	
-\item Curl the fully qualified domain name of \acrshort{elb} in order to test \acrshort{elb} the address info
+\begin{itemize}	
+\item Curl the fully qualified domain name of \acrshort{elb} in order to check the \acrshort{elb} 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com:5000 2>/dev/null | grep 'Addrinfo:' | gawk '{print $4}'
+$ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | grep 'Addrinfo:' | gawk '{print $4}'
 !\outputcommand{10.192.182.72\&gt;,}!
-$ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com:5000 2>/dev/null | grep 'Addrinfo:' | gawk '{print $4}'
+$ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | grep 'Addrinfo:' | gawk '{print $4}'
 !\outputcommand{10.210.202.71\&gt;,}!
 \end{lstlisting}
-\end{enumerate}
+\end{itemize}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -437,42 +476,69 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com:5000 2>/dev/null 
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]
-\frametitle{Launch Configuration and Auto Scaling Group}
+\begin{frame}[fragile]
+\frametitle{Launch Configuration}
 \begin{enumerate}
-\item Created a launch configuration by providing all the information required to launch EC2 instances
-\begin{enumerate}
-\item Choose \acrshort{ami} among ``My AMIs'' or ``AWS Marketplace'' or ``Community AMIs''
-\item Choose Instance Type among  ``micro'', ``small'', ``medium'', \dots
-\item Configure details: ``Name'', ``Purchasing option (Request Spot Instances)'', ``IAM Role'' and  ``Monitoring (Enable CloudWatch detailed monitoring)''
+\item Choose \acrshort{ami} (\texttt{Clone Centos (i386) - with Updates - ami-af330fc6})
+\item Choose Instance Type \texttt{t1.micro}
+\item Configure details \texttt{Name: `depot-app-launch-configuration', Monitoring: `Yes'}
 \item Add Storage
-\item Configure Security Group
+\item Configure Security Group \texttt{Name: `web, ssh and data', Description: `Allow http, https, ssh, 3000, 5000'}
 \item Review
 \end{enumerate}
-\item Created an Auto Scaling group by defining maximum, minimum, and (optionally), the desired capacity for the EC2 instances
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Auto Scaling Group}
+\begin{center}
+\includegraphics[scale=0.30]{review-autoscale.png}
+\end{center}
 \begin{enumerate}
-\item Configure Auto Scaling group details: ``Launch Configuration'', ``Group name'',  ``Group size Start with \texttt{n} instances'', ``Network'', ``Availability Zone(s)''
-\item Configure scaling policies ``Keep this group at its initial size'' or ``Use scaling policies to adjust the capacity of this group''
-\item Configure Notifications (Configure your Auto Scaling group to send notifications to a specified endpoint, such as an email address, whenever a specified event takes place, including: successful launch of an instance, failed instance launch, instance termination, and failed instance termination)
+\item Configure Auto Scaling group details'
+\begin{center}
+\includegraphics[scale=0.30]{create-auto-scaling01.png}
+\end{center}
+\item Configure scaling policies 
+\begin{center}
+\includegraphics[scale=0.25]{configure-scaling-policies.png}
+\end{center}
+\item Configure Notifications (successful launch of an instance, failed instance launch, instance termination, failed instance termination \dots)
 \item Review
 \end{enumerate}
-\item Created an Amazon CloudWatch alarm and defined which metrics to monitor
-\item Created two scaling policies, one for scaling out and another for scaling in, and associated the policies with the alarm
-\item Associated the scaling policies with the Auto Scaling group
-\end{enumerate}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Testing the AutoScaling Group}
+
+\lstset{language=shell}
+\begin{itemize}
+ \item Be patient!
+  \begin{lstlisting}[escapechar=!]
+     $ ab -n 120 -c 2  http://depot_app.com/
+  \end{lstlisting}
+
+\begin{center}
+\includegraphics[scale=0.45]{autoscalingwork.png}
+\end{center}
+\end{itemize}
+
+
+
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]
-\frametitle{Alarm and Policy}
+\section{Homework}
+\begin{frame}[fragile]
+\frametitle{Homework}
 \begin{itemize}
-\item An Auto Scaling group uses a combination of \emph{policies} and \emph{alarms} to determine when the specified conditions for launching and terminating instances are met
-\item An \emph{alarm} is an object that watches over a single metric (for example, the average CPU utilization of your EC2 instances in an Auto Scaling group) over a time period that you specify. When the value of the metric breaches the thresholds that you define, over a number of time periods that you specify, the alarm performs one or more actions. An action can be sending messages to Auto Scaling
-\item A \emph{policy} is a set of instructions for Auto Scaling that tells the service how to respond to alarm messages
-\item Along with creating a launch configuration and Auto Scaling group, you need to create the alarms and the scaling policies and associate them with your Auto Scaling group. When the alarm sends the message, Auto Scaling executes the associated policy on your Auto Scaling group to scale the group in (that is, to terminate instances) or scale the group out (that is, to launch instances).
-\end{itemize}
+\item El próximo día dd del mes mm del año aaaa tendrá lugar a la hora hh:mm:ss el evento del año para nuestro ``site'' (venta de las entradas de la
+``Gala Drag Queen'', lanzamiento de la versión beta del ``Need for Speed'' o simplemente el anodino acceso a una plataforma ``Moodle'' de todos los alumnos a la misma hora de la mañana al inicio de un día. 
+Utiliza \acrshort{elb}, AutoScaling, CloudWatch para provisionar instancias para solventar ese pico horario. Comprueba el provisionamiento y la terminación de las instacias
 
+\item Scale your favorite Content Manager System (Joomla!, Drupal \dots) in Amazon
+\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
