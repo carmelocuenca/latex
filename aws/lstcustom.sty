@@ -2,30 +2,36 @@
 \usepackage{MnSymbol} 
 % extension, if, then, else, switch, Void, Boolean, Integer, Real, String, let
 
+
 %\definecolor{green}{rgb}{0.0,1.0,0.0}
 \lstdefinelanguage{shell}
 {
   alsodigit={>},
-  basicstyle=\scriptsize\lstfontfamily,
-  emphstyle=\color{red}\bfseries, 
+  %basicstyle=\scriptsize\lstfontfamily,
+  basicstyle=\scriptsize\ttfamily,
+  %emphstyle=\color{red}\bfseries, 
   keywordstyle=\color{darkviolet}\bfseries,
   commentstyle=\color{darkgreen},
   stringstyle=\color{darkblue},
-  numberstyle=\color{darkgrey}\lstfontfamily,
+  % numberstyle=\color{darkgrey}\lstfontfamily,
+  numberstyle=\color{darkgrey}\ttfamily,
   emphstyle=\color{red},
   morecomment=[s][\color{lightblue}]{/**}{*/},
-  columns=fixed, 
-%  columns=fullflexible, %spaceflexible, %flexible, fullflexible             
+  columns=fullflexible, 
+%  columns=fullflexible, %fixed, %spaceflexible, %flexible, fullflexible             
 %  escapeinside=`',
 %  escapechar=@,
   showstringspaces=false,
-  upquote=true,
 % numbers=left
   breaklines=true,
+  upquote=true,
+  numbers=none,
   morekeywords={cd, ls, mkdir},
   backgroundcolor=\color{lstbackgroundshellcolor},
   %keywordstyle=\color{green}
-  literate={\$}{{\textcolor{blue}{\$}}}1,
+  %literate={\$}{{\textcolor{blue}{\$}}}1,
+  literate={-}{-}1
+  %literate={-}{-}1
 }
 
 

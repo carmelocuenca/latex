@@ -1,38 +1,32 @@
 \usepackage{color}
-\usepackage{MnSymbol} 
+
 % extension, if, then, else, switch, Void, Boolean, Integer, Real, String, let
 
-%\definecolor{green}{rgb}{0.0,1.0,0.0}
 %\definecolor{green}{rgb}{0.0,1.0,0.0}
 \lstdefinelanguage{shell}
 {
   alsodigit={>},
-  %basicstyle=\scriptsize\lstfontfamily,
-  basicstyle=\scriptsize\ttfamily,
-  %emphstyle=\color{red}\bfseries, 
+  basicstyle=\scriptsize\lstfontfamily,
+  emphstyle=\color{red}\bfseries, 
   keywordstyle=\color{darkviolet}\bfseries,
   commentstyle=\color{darkgreen},
   stringstyle=\color{darkblue},
-  % numberstyle=\color{darkgrey}\lstfontfamily,
-  numberstyle=\color{darkgrey}\ttfamily,
+  numberstyle=\color{darkgrey}\lstfontfamily,
   emphstyle=\color{red},
   morecomment=[s][\color{lightblue}]{/**}{*/},
-  columns=fullflexible, 
-%  columns=fullflexible, %fixed, %spaceflexible, %flexible, fullflexible             
+%  columns=fullflexible, %spaceflexible, %flexible, fullflexible             
 %  escapeinside=`',
 %  escapechar=@,
   showstringspaces=false,
 % numbers=left
   breaklines=true,
-  upquote=true,
   numbers=none,
-  morekeywords={cd, ls, mkdir},
+  morekeywords={cd, ls, mkdir, yum, wget, curl, su, chmod, echo, ssh, adduser, createuser, git, service, chkconfig, setenforce, system-config-firewall-tui, rm, rpm},
   backgroundcolor=\color{lstbackgroundshellcolor},
   %keywordstyle=\color{green}
-  %literate={\$}{{\textcolor{blue}{\$}}}1,
-  literate={-}{-}1
-  %literate={-}{-}1
+  literate={\$}{{\textcolor{blue}{\$}}}1
 }
+
 
 
 \lstdefinelanguage{KLP}
@@ -62,7 +56,6 @@
   morecomment=[l]{\%},
   morestring=[b]",
 }
-
 
 
 \newcommand{\lstfontfamily}{\ttfamily}
@@ -125,19 +118,14 @@
   emphstyle=\color{red},
     % get also javadoc style comments
   morecomment=[s][\color{lightblue}]{/**}{*/},
-  columns= fullflexible, %spaceflexible, %flexible, fullflexible             
+   %columns=fullflexible, %spaceflexible, %flexible, fullflexible             
 %  escapeinside=`',
 %  escapechar=@,
   showstringspaces=false,
-  numbers=left,
+  numbers=none,
   upquote=true,
-  morekeywords={new, private},
-  breaklines=true,
   backgroundcolor=\color{lstbackgroundshellcolor},
-  prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\rhookswarrow}},
-  postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\rcurvearrowse\space}},
-  breaklines=true, breakatwhitespace=true,
-  numbers=left, numberstyle=\scriptsize
+  breaklines=true,
 }
 
 \lstdefinestyle{black}{
@@ -163,5 +151,3 @@
   tabsize=4,
   showstringspaces=false
 }
-
-

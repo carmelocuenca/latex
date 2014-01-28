@@ -201,7 +201,7 @@ psql (9.3.2, servidor 9.3.1)\\
 \item Start and login in the \acrshort{ec2} instance
 
 \lstset{language=shell, escapechar=!}
-\begin{lstlisting}[escapechar=!]
+\begin{lstlisting}[escapechar=!, columns=fixed]
 $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 # su - depot_app
 \end{lstlisting}
@@ -270,6 +270,8 @@ $ ab -n request -c concurrency [http[s]://]hostname[:port]/path
    \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Testing a Web Application}
 \begin{itemize}
@@ -287,70 +289,33 @@ $ tail -f log/production.log log/unicorn.std*
 \end{lstlisting}
 \includegraphics[scale=0.15]{lograils.eps}
 
-\item Run Apache Bench \texttt{ab} in order to stress the Web Site
-
-\lstset{language=shell}
-\begin{lstlisting}[escapechar=!]
-$ ab -n 60 -c 2  http://depot_app.com/
-\end{lstlisting}
-
-
-\lstset{language=shell}
-\begin{lstlisting}[escapechar=!]
-This is ApacheBench, Version 2.0.40-dev <$Revision: 1.146 $> apache-2.0
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Copyright 2006 The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking depot_app.com (be patient).
-   
-....done
-
-
-Server Software:
-Server Hostname:        depot_app.com
-Server Port:            80
-
-Document Path:          /
-Document Length:        85450 bytes
-
-Concurrency Level:      2
-Time taken for tests:   43.910998 seconds
-Complete requests:      60
-Failed requests:        0
-Write errors:           0
-Total transferred:      5177820 bytes
-HTML transferred:       5127000 bytes
-Requests per second:    1.37 [#/sec] (mean)
-Time per request:       1463.700 [ms] (mean)
-Time per request:       731.850 [ms] (mean, across all concurrent requests)
-Transfer rate:          115.14 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:      124  141  14.2    149     167
-Processing:  1019 1301 174.2   1272    1931
-Waiting:      266  357  76.1    346     625
-Total:       1143 1443 183.2   1418    2082
-
-Percentage of the requests served within a certain time (ms)
-  50%   1418
-  66%   1492
-  75%   1562
-  80%   1602
-  90%   1679
-  95%   1741
-  98%   1851
-  99%   2082
- 100%   2082 (longest request)
-
-\end{lstlisting}
-
-\item Monitoring CloudWatch metrics in the ``Monitoring Tab''
-
-\end{itemize}
+\item Run JMeter (More info in \url{http://jmeter.apache.org/index.html}) and create a test plan
 \begin{center}
-\includegraphics[width=0.75 \textwidth]{cpuutilization.png}
+\includegraphics[scale=0.15]{plandeprueba.eps}
 \end{center}
+\begin{center}
+\includegraphics[scale=0.15]{plandeprueba1.eps}
+\end{center}
+
+\begin{enumerate}
+\item Right-click on the Test Plan node and choose \texttt{Add - Threads (Users) - Thread Group}
+\item Configure the thread group with 240 threads, a ramp-up period of 720 seconds (12 minutes), and a loop count of 1
+\item Right-click on the new Thread Group node and choose \texttt{Add - Sampler - HTTP Request}
+\item Enter your server host name or IP address ( omit the \texttt{http://} protocol prefix) and port (80 should be fine)
+\item Enter \texttt{``/''} for the path to retrieve the home page from the site
+\item Right-click on the Test Pl an node once again. Add the following listener nodes: \texttt{Generate Summary Results, Aggregate Report, and Graph Results}
+
+\end{enumerate}
+
+\item Monitoring results and CloudWatch metrics in the ``Monitoring Tab''
+\begin{center}
+\includegraphics[scale=0.15]{plandeprueba2.eps}
+\end{center}
+\begin{center}
+\includegraphics[scale=0.15]{cpuutilization.png}
+\end{center}
+\end{itemize}
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -384,7 +349,7 @@ Percentage of the requests served within a certain time (ms)
 
 \item Create an \acrshort{ami} of our \acrshort{ec2} instance and launch a new clone of our \acrshort{ec2} machine
 \begin{center}
-\includegraphics[scale=0.25]{createimage.eps}
+\includegraphics[scale=0.20]{createimage.eps}
 \end{center}
 \item Curl both IPs in order to test both \acrshort{ec2} instances
 \end{enumerate}
@@ -427,7 +392,7 @@ result, an \acrshort{elb} is not referenced by an IP address, but by a fully qua
 \end{center}
 \item Add \acrshort{ec2} instances
 \begin{center}
-\includegraphics[scale=0.3]{createaelb1.png}
+\includegraphics[scale=0.25]{createaelb1.png}
 \end{center}	
 \item Review
 \end{enumerate}
@@ -513,31 +478,24 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
 
 \lstset{language=shell}
 \begin{itemize}
- \item Be patient!
-  \begin{lstlisting}[escapechar=!]
-     $ ab -n 120 -c 2  http://depot_app.com/
-  \end{lstlisting}
-
+ \item Use JMeter to define a web load and check that the AutoScaling Group work properly
 \begin{center}
 \includegraphics[scale=0.45]{autoscalingwork.png}
 \end{center}
 \end{itemize}
 
-
-
-
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Homework}
 \begin{frame}[fragile]
 \frametitle{Homework}
 \begin{itemize}
-\item El próximo día dd del mes mm del año aaaa tendrá lugar a la hora hh:mm:ss el evento del año para nuestro ``site'' (venta de las entradas de la
-``Gala Drag Queen'', lanzamiento de la versión beta del ``Need for Speed'' o simplemente el anodino acceso a una plataforma ``Moodle'' de todos los alumnos a la misma hora de la mañana al inicio de un día. 
+\item El próximo \texttt{dd/mm/aaaa} tendrá lugar a la hora \texttt{hh/mm/ss} el evento del año para nuestro ``site'' (venta de las entradas de la
+``Gala Drag Queen'', lanzamiento de la versión beta del ``Grand Theft Auto'' o simplemente el anodino acceso a una plataforma ``Moodle'' de todos los alumnos simultaneamente a las \texttt{8:30} hora de la mañana al inicio de un día). 
 Utiliza \acrshort{elb}, AutoScaling, CloudWatch para provisionar instancias para solventar ese pico horario. Comprueba el provisionamiento y la terminación de las instacias
 
-\item Scale your favorite Content Manager System (Joomla!, Drupal \dots) in Amazon
+\item Scale your favorite Content Management System (Joomla!, Drupal \dots) in Amazon
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

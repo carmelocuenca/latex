@@ -42,7 +42,7 @@
 
 \graphicspath{ {./images/} }
 
-\title{Deploying a Ruby on Rails Application in an Amazon EC2 Virtual Machine}
+\title{Deploying a Web Server Application in an Amazon EC2 Virtual Machine}
 %\subtitle[short subtitle]{long subtitle}
 \author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
 %\institute{Escuela Universitaria de Informática}
@@ -127,9 +127,9 @@ La metodología consiste en añadir primeramente un usuario para cada aplicació
 
 \item Mediante \acrfull{rvm} instalaremos Ruby y \acrshort{ror}. Con ``Git''  colocaremos el código en la máquina virtual. Comprobaremos que funciona en los entornos de test y desarrollo.
 
-\item Ya sólo nos faltará desplegar  un servidor porfesional de \acrshort{ror}, nuestra elección para ilustrar ha sido el más complejo de configurar ``unicorn''. Instalaremos Unicorn, comprobarmeos que funciona en el entorno de produción y escribiremos un script para lanzarlo como un servicio.
+\item Ya sólo nos faltará desplegar  un servidor porfesional de \acrshort{ror}, nuestra elección para ilustrar ha sido el más complejo de configurar ``unicorn''. Instalaremos Unicorn, comprobaremos que funciona en el entorno de producción y escribiremos un script para lanzarlo como un servicio.
 
-\item Finalmente, el alumno desarrollará un trabajo similar de desplegar cualquier otra aplicación \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mogol).
+\item Finalmente, el alumno desarrollará un trabajo similar de desplegar cualquier otra aplicación \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mogol) o el despliegue de un gestor de contenidos.
 
 \end{itemize}
 \end{frame}
@@ -166,9 +166,10 @@ $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 \section{Installing a LAMP Web Server}
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Installing a LAMP Web Server}
-\lstset{language=shell, escapechar=!}
 \begin{itemize}
 \item To ensure that all of your software packages are up to date, perform a quick software update on your instance
+
+\lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 # yum update -y
 \end{lstlisting}
@@ -179,6 +180,7 @@ $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 # yum groupinstall -y "Web Server" "MySQL Database" "PHP Support"
 \end{lstlisting}
 \item Install the php-mysql package
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 # yum install -y php-mysql
 \end{lstlisting}
@@ -238,7 +240,7 @@ Since \texttt{newt-python} is required for \texttt{system-config-firewall-tui to
 \item To test your LAMP web server in a web browser,  create simple html and PHP files in the \texttt{/var/www/html} directory that will be available from the Internet with
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=&]
-# echo `<p>Hello World!<p>' > /var/www/html/index.html
+# echo '<p>Hello World!<p>' > /var/www/html/index.html
 # echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
 \end{lstlisting}
 
@@ -527,7 +529,7 @@ host    all all ::1/128 md5 !\circled{4}!
 $ chmod 0711 /home/depot_app
 $ mkdir public_html
 $ chmod +rx public_html
-$ echo `<p>Hello World!</p>' >  public_html/index.html
+$ echo '<p>Hello World!</p>' >  public_html/index.html
 \end{lstlisting}
 
 \begin{block}{Warning!}
@@ -570,7 +572,7 @@ echo "update:  --no-rdoc --no-ri" >> ~/.gemrc
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 $ cd ~/public_html
-$ git clone https://github.com/ashwin28/depot_app
+$ git clone https://github.com/carmelocuenca/depot_app
 \end{lstlisting}
 
 \item Then we install the gems 
@@ -607,7 +609,7 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Application in Developent and Production Environments}
 \begin{itemize}
-\item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQ}L instead of sqlite3 database
+\item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQL}
 
 \lstset{language=Ruby, style=eclipse, numbers=left}
 \begin{lstlisting}[escapechar=!]
@@ -631,28 +633,28 @@ $ rake db:migrate RAILS_ENV=production
 $ rake db:seed RAILS_ENV=production
 \end{lstlisting}
 
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ rails server --environment production
 \end{lstlisting}
 
 \item Curl the URL of the files you just created
 
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ curl http://my.public.dns.amazonaws.com:3000
 \end{lstlisting}
 
 Problems? Kill Webrick server and export the ``assests''. 
 
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ rake assets:precompile RAILS_ENV=production
 $ rails server --environment production
 \end{lstlisting}
 
 \item Curl the URL of the files you just created. It works!
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ curl http://my.public.dns.amazonaws.com:3000
 \end{lstlisting}
@@ -685,7 +687,7 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 $ cd ~/public_html/depot_app
-$ echo "gem `unicorn`, group:  :production" >> Gemfile
+$ echo "gem 'unicorn', group:  :production" >> Gemfile
 $ bundle install
 !\outputcommand{A lot of stuff...}!
 \end{lstlisting}
@@ -702,7 +704,7 @@ $ rvm wrapper ruby-2.0.0-p353@railstutorial_rails_4_0 bootup unicorn
 \item Download \href{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}
 and save as \texttt{config/unicorn.rb}. Then edit the unicorn configuration file \texttt{config/unicorn.rb}
 
-\lstset{language=Ruby, style=eclipse}
+\lstset{language=shell, numbers=left}
 \begin{lstlisting}[escapechar=!]
 # config/unicorn.rb
 # !\circled{1}!
@@ -747,7 +749,7 @@ stdout_path APP_PATH + "/log/unicorn_depot_app.stdout.log"
 
 \item Run Unicorn Server in production mode
 
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ unicorn -E production -p 3000
 \end{lstlisting}
@@ -775,7 +777,7 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \frametitle{Writing an Unicorn Init Script}
 \begin{itemize}
 \item Create and start the init script \texttt{/etc/init.d/unicorn\_depot\_app} with port number \texttt{\alert{5000}}
-\lstset{language=shell, escapechar=!}
+\lstset{language=shell, numbers=left}
 \begin{lstlisting}[escapechar=!]
 #/bin/bash
 
@@ -876,7 +878,7 @@ NameVirtualHost *:80
 \item Add to the file \texttt{/etc/hosts}
 \lstset{language=shell, escapechar=&}
 \begin{lstlisting}
-# echo "my.public.dns.amazonaws.com depot_app depot_app.com >> /etc/hosts" 
+# echo "my.public.dns.amazonaws.com depot_app.com >> /etc/hosts" 
 \end{lstlisting}
 
 \item Restart Apache daemon
@@ -903,7 +905,7 @@ $ curl http://depot_app.com
   \begin{itemize}
     \item Deployment a Rails Application with Mongrel, Passenger or Thin
     \item Start Up PhpPgAdmin tool
-    \item Deployment your favorite Content Manager System (Joomla!, Drupal \dots in Amazon)
+    \item Deploy your favorite Content Management System (Joomla!, Drupal \dots) in Amazon
   \end{itemize}
 \end{frame}
 
