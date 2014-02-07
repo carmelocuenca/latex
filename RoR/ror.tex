@@ -134,7 +134,7 @@ $ ruby -v
 \item Create the gemset ``\texttt{<name\_app>}'' associated with Ruby 2.0.0 while arranging to start using it immediately and setting it as the default gemset
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-$ rvm gemset use 2.0.0@<name\_app> --create --default
+$ rvm gemset use 2.0.0@<name_app> --create --default
 !\outputcommand{Using ruby-2.0.0-p247 with gemset <app\_name>}!
 $ rvm gemset list
 !\outputcommand{(default)}!
@@ -142,6 +142,13 @@ $ rvm gemset list
 !\outputcommand{=> <name\_app>}!
 $ rvm current
 !\outputcommand{=> <name\_app>}!
+\end{lstlisting}
+\item Creating a gem configuration file \texttt{~/.gemrc} in order to avoid rdoc and ri installation
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+echo "install: --no-rdoc --no-ri" > ~/.gemrc
+echo "update:  --no-rdoc --no-ri" >> ~/.gemrc
 \end{lstlisting}
 \item Install Rails
 \begin{lstlisting}[escapechar=!]
@@ -267,7 +274,7 @@ Rails comes with a command-line program, or script, that runs a local web server
 $ rails server
 !\outputcommand{=> Booting WEBrick}!
 !\outputcommand{=> Rails 4.0.0 application starting in development on http://0.0.0.0:3000}!
-!\outputcommand{=> Run `rails server -h` for more startup options}!
+!\outputcommand{=> Run `rails server -h` for more start up options}!
 !\outputcommand{=> Ctrl-C to shutdown server}!
 \end{lstlisting}
 We can see the result of visiting \url{http://localhost:3000/}
@@ -275,7 +282,7 @@ We can see the result of visiting \url{http://localhost:3000/}
 $ rails server -p 3456
 !\outputcommand{=> Booting WEBrick}!
 !\outputcommand{=> Rails 4.0.0 application starting in development on http://0.0.0.0:3456}!
-!\outputcommand{=> Run `rails server -h` for more startup options}!
+!\outputcommand{=> Run `rails server -h` for more start up options}!
 !\outputcommand{=> Ctrl-C to shutdown server}!
 \end{lstlisting}
 We can see the result of visiting \url{http://localhost:3456/}
@@ -415,44 +422,6 @@ $ heroku run rake db:migrate
 \end{lstlisting}
 
 \end{frame}
-
-\subsection{Vocabulary}
-\begin{frame}[fragile]
-\frametitle{Vocabulary}
-Ruby, rvm, gemset, gem, Rails, bundler, Test::Unit, Git, Rack, Gemfile, Gemfile.lock, GitHub, Heroku, ssh, key, MemCached, PostgreSQL, NoSQL
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-\section{A Content Management System}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Adding Users and Gropus}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building a News Blog with RSS Feeds and an API}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building a Discussion Forum}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building a Blogging Engine with Web Services Support}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building a Photo Gallery}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Sending E-mail and Building a Newsletter Mailing List}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Adding Friends with XFN Details}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Adding Tags to the Photo Gallery}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Creating Mashups and Integrating with Web 2.0}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Adding User-Created Themes to the Blogging Engine}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{A Mobile Interface}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Deploying, Optimizing, and Scaling the Application}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 
 \end{document}

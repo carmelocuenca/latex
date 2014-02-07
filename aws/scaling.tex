@@ -64,7 +64,7 @@
 
 
 \section*{Outline}
-\begin{frame}
+\begin{frame}[fragile, allowframebreaks]
   \frametitle{Outline}
   %\tableofcontents%[part=1,pausesections]
   %\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
@@ -177,7 +177,7 @@ in case you work with multiple EC2 accounts
  \item DB Instance Details (Choose ``depot-app-production'' like \texttt{DB Instance Identifier} (hint: \texttt{DB Instance Identifier} must contain only letters, digits, or hyphens) and \texttt{Master Password} must be at least 8 characteres)
   \item Additional Config (Choose ``depot\_app\_production'' like \texttt{Database Name:} and ``production'' like \texttt{DB Security Group(s):})
   \item Management Options (Choose ``No'' for \texttt{Enabled Automatic Backups:}) 
-  \item Review \& Laun DB Instance
+  \item Review \& Launch DB Instance
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,7 +185,7 @@ in case you work with multiple EC2 accounts
 \frametitle{Test a \acrshort{rds} Instance}
 \begin{itemize}
  \item Test with a PostgreSQL client a \acrshort{rds} instance
- \lstset{language=shell, breaklines=true, escapechar=!}
+ \lstset{language=shell, breaklines=true}
   \begin{lstlisting}[escapechar=!]
   $ psql -W -h depot-app-production.ccoguny6ikux.us-east-1.rds.amazonaws.com  depot_app_production depot_app
   !\outputcommand{Contraseña para usuario depot\_app:\\
@@ -201,7 +201,7 @@ psql (9.3.2, servidor 9.3.1)\\
 \item Start and login in the \acrshort{ec2} instance
 
 \lstset{language=shell, escapechar=!}
-\begin{lstlisting}[escapechar=!, columns=fixed]
+\begin{lstlisting}[escapechar=!]
 $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 # su - depot_app
 \end{lstlisting}
@@ -235,7 +235,7 @@ production:
 
 \item Migrate \texttt{depot\_app\_production} tables and  seed the data
 
-\lstset{language=shell, style=eclipse}
+\lstset{language=shell}
 \begin{lstlisting}[numbers=none, escapechar=!]
 $ rake db:migrate RAILS_ENV=production
 $ rake db:seed RAILS_ENV=production

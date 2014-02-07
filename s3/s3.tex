@@ -1,6 +1,8 @@
 \documentclass{beamer}
 \usepackage[british,spanish]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage[british,spanish]{babel}
+%usepackage[utf8]{inputenx}
 
 \usepackage{hyperref}
 %\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
@@ -195,6 +197,34 @@ to avoid writing an infinite loop which costs you money with every iteration
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{S3 AWS Management Console}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{S3 AWS Management Console}
+\begin{itemize}
+\item With the AWS Management Console you can easily manage Amazon S3 buckets and objects. You can create buckets, upload objects, and manage all aspects of your Amazon S3 resources
+\end{itemize}
+
+\begin{columns}
+ \column{0.33 \textwidth}
+ \begin{itemize}
+ \item Create Buckets
+\includegraphics[width= 0.75 \textwidth]{console_thumb_s3_01.png}
+ \end{itemize}
+\column{0.33 \textwidth}
+\begin{itemize}
+ \item Upload Files
+\includegraphics[width= 0.75 \textwidth]{console_thumb_s3_02.png}
+ \end{itemize}
+\column{0.33 \textwidth}
+\begin{itemize}
+ \item Manage Your Resources
+\includegraphics[width= 0.75 \textwidth]{console_thumb_s3_03.png}
+ \end{itemize}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Setup and Running AWS API}
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Setup and Running AWS API}
@@ -253,10 +283,21 @@ $  gem install aws-sdk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Programming S3}
-\subsection{Creating a S3 buckets}
+\subsection{Creating a S3 bucket}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Creating a S3 buckets}
+\frametitle{Creating a S3 bucket}
 \begin{itemize}
+
+\item Set up aws project directory
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ mkdir ~/ruby_projects
+$ mkdir ~/ruby_projects/aws_app
+$ echo "2.0.0" > ~/ruby_projects/aws_app/.ruby-version
+$ echo "aws_app" > ~/ruby_projects/aws_app/.ruby-gemset
+$ cd ~/ruby_projects/aws_app
+\end{lstlisting}
+
 \item \texttt{aws\_app/config.yml}
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
@@ -268,16 +309,6 @@ $  gem install aws-sdk
                
 access_key_id: YOUR_ACCESS_KEY_ID
 secret_access_key: YOUR_SECRET_ACCESS_KEY
-\end{lstlisting}
-
-\item Set up aws project directory
-\lstset{language=shell, escapechar=!}
-\begin{lstlisting}[escapechar=!]
-$ mkdir ~/ruby_projects
-$ mkdir ~/ruby_projects/aws_app
-$ cd ~/ruby_projects/aws_app
-$ echo "2.0.0" > .ruby-version
-$ echo "aws_app" > .ruby-gemset
 \end{lstlisting}
 
 \item \texttt{aws\_app/config.rb}
@@ -308,30 +339,7 @@ To run the samples, put your credentials in config.yml as follows:
 
 access_key_id: YOUR_ACCESS_KEY_ID
 secret_access_key: YOUR_SECRET_ACCESS_KEY
-#
-# aws_app/s3/create_bucket.rbA bit of Dont Repeat Yourself
-#
-# Usage: ruby create_bucket.rb [<bucket_name>]
 
-require File.expand_path("#{File.dirname(__FILE__)}/../config")
-require File.expand_path("#{File.dirname(__FILE__)}/book.inc")
-
-if ARGV.size > 1
-  puts "Usage: #{__FILE__} [<BUCKET_NAME>]"
-  exit 1
-end
-
-bucket_name =  ARGV.size != 1 ? BOOK_BUCKET :  ARGV[0]
-
-# get an instance of the s3 interface using the default configuration
-s3 = AWS::S3.new
-
-begin
-  bucket = s3.buckets.create bucket_nameA bit of Dont Repeat Yourself
-  puts "#{bucket.name} bucket created"
-rescue Exception => e
-  puts e.message
-end
 END
   exit 1
 end
@@ -350,7 +358,6 @@ END
 end
 
 AWS.config(config)
-
 \end{lstlisting}
 
 \item \texttt{aws\_app/s3/create\_bucket.rb}
@@ -396,8 +403,8 @@ end
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]
 \subsection{Listing your S3 buckets}
+\begin{frame}[fragile, allowframebreaks]
 \frametitle{Listing your S3 buckets}
 \begin{itemize}
 \item Here is how to list your S3 buckets (\texttt{list\_buckets.rb})
@@ -432,8 +439,8 @@ francisca.quintana}!
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]
 \subsection{Bucket Listing as a Web Page}
+\begin{frame}[fragile, allowframebreaks]
 \frametitle{Bucket Listing as a Web Page}
 \begin{itemize}
 \item Install the minimalistic ``Sinatra'' framework
@@ -444,14 +451,12 @@ $ gem install sinatra
 
 
 \item There are numerous template engines available; \texttt{Erb}, \texttt{Haml}, and \texttt{Erubis} are
-just a few. We’ll use \texttt{Erb} for our templates as it’s fairly ubiquitous in the Ruby com-
-munity these days, although any mature engine will do just fine as the usage is essen-
-tially the same in all cases
+just a few. We’ll use \texttt{Erb} for our templates as it’s fairly ubiquitous in the Ruby community these days, although any mature engine will do just fine as the usage is essentially the same in all cases
 
 \item Write the template view file \texttt{aws\_app/views/s3/list\_buckets.html.erb}
 
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=!]
+\begin{lstlisting}[escapechar=?]
 <!DOCTYPE html>
 <html>
 <head>
@@ -596,7 +601,7 @@ BOOK_BUCKET = :developing_cloud_application_bucket
 S3_AMAZONAWS_URL = 'https://s3.amazonaws.com'
 
 def get_bucket_objects(s3, bucket_name, prefix = '') #!\circled{1}!
-  options = {bucket_name: bucket_name+'j', marker: '', max_keys: 8, prefix: prefix}
+  options = {bucket_name: bucket_name, marker: '', max_keys: 8, prefix: prefix}
   begin
     objects = []
     begin #!\circled{3}!
@@ -670,7 +675,7 @@ loop
 get '/s3/list_bucket_objects' do
   # get an instance of the S3 interface using the default configuration
   @s3 = AWS::S3.new
-  @bucket_name = params[:bucket_name]
+  @bucket_name = params[:bucket_name].nil? ? BOOK_BUCKET : params[:bucket_name]
   @output_title = 'Expert in Virtualization and Cloud Computing - List of S3 objects in a bucket'
   @output_message = "A simple HTML table displaying of all the objects in the #{@bucket_name} bucket"
   @bucket_objects =  get_bucket_objects @s3, @bucket_name
@@ -680,6 +685,7 @@ end
 \item Finally, curl the url on the local server
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
+  $ http://localhost:4567/s3/list_bucket_objects
   $ http://localhost:4567/s3/list_bucket_objects?bucket_name=!\dots!
 \end{lstlisting}
 
@@ -689,7 +695,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile,allowframebreaks]
-\frametitle{A bit of Dont Repeat Yourself}
+\frametitle{A bit of Don't Repeat Yourself}
 \begin{itemize}
  \item The DRY principle is stated as ``Every piece of knowledge must have a single, unambiguous, authoritative representation within a system''
 
@@ -708,11 +714,11 @@ routes.each do |route|
     title = 'Expert in Virtualization and Cloud Computing'
     @s3 = AWS::S3.new
     case route
-      when routes[0]
+       when routes[0]
         @output_title = "#{title} - List of S3 buckets"
         @output_message = 'A simple HTML list of your S3 buckets'
       when routes[1]
-        @bucket_name = params[:bucket_name]
+        @bucket_name = params[:bucket_name].nil? ? BOOK_BUCKET : params[:bucket_name]
         @output_title = "#{title} - List of S3 objects in a bucket"
         @output_message = "A simple HTML table displaying of all the objects in the #{@bucket_name} bucket"
         @bucket_objects =  get_bucket_objects @s3, @bucket_name
@@ -726,9 +732,9 @@ end
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Upload File}
+\subsection{Upload Files}
 \begin{frame}[fragile,allowframebreaks]
-\frametitle{Upload File}
+\frametitle{Upload Files}
 \begin{itemize}
  \item We will add two more utility method to our \texttt{book.inc.rb} file. The first method is called \texttt{upload\_object}
 
@@ -838,9 +844,9 @@ $ ruby s3/list_bucket_objects.rb
 
 \end{frame}
 
-\subsection{Creating and Storing Thumnails Images}
+\subsection{Creating and Storing Thumnail Images}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Creating and Storing Thumnails Images}
+\frametitle{Creating and Storing Thumnail Images}
 \begin{itemize}
 \item Our next utility function will take an in-memory image, figure out the appropriate
 height and width for a thumbnail, and then create the thumbnail
@@ -861,7 +867,7 @@ THUMB_SIZE = 200
 THUMB_BUCKET_SUFFIX = '-thumbs'
 \end{lstlisting}
 
-\item Here’s the code for the thumbnailImage function; once again, this goes into our \texttt{book.inc.rb} file:
+\item Here’s the code for the thumbnail image function; once again, this goes into our \texttt{book.inc.rb} file:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -904,7 +910,7 @@ $ gem install mini_magick
 \end{lstlisting}
 
 
-\item With this code in hand it is now a simple matter to do some argument p
+\item With this code in hand it is now a simple matter to do some argument processing
 and thumbnail each image in the given bucket. Here is how to do it:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -1035,7 +1041,7 @@ end
 \item Run \texttt{list\_distribution} utility
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$  ruby s3/list\_distributions.rb 
+$  ruby s3/list_distributions.rb 
 !\outputcommand{Id = EDXGI4G4HKW3B\\
 Domain name = d1xhkx9ok8zmm7.cloudfront.net\\
 \dots}!
@@ -1045,9 +1051,9 @@ Domain name = d1xhkx9ok8zmm7.cloudfront.net\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Listing S3 Files with Thumbnails}
+\subsection{Listing S3 Files with Thumbnails with CloudFront}
 \begin{frame}[fragile,allowframebreaks]
-\frametitle{Listing S3 Files with Thumbnails}
+\frametitle{Listing S3 Files with Thumbnails with CloudFront}
 \begin{itemize}
 \item We first need one more utility function
 to make this work: the  function that will return the
@@ -1226,6 +1232,78 @@ end
 \item We curl \url{http://localhost:4567/s3/list\_bucket\_objects\_page\_thumbs} in order to check the written code
 \end{itemize}
 \end{frame}
+
+\section{Homework}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Homework}
+\begin{itemize}
+\item  S3 Filesystem (with Elastic Drive? witn s3fs?)
+\item \texttt{s3 sync}
+\begin{enumerate}
+\item The following \texttt{sync} command syncs objects under a specified prefix and bucket to files in a local directory by uploading the local files to \acrshort{s3}. A local file will require uploading if the size of the local file is different than the size of the \acrshort{s3} object, the last modified time of the local file is newer than the last modified time of the \acrshort{s3} object, or the local file does not exist under the specified bucket and prefix. In this example, the user syncs the bucket mybucket to the local current directory. The local current directory contains the files \texttt{test.txt} and \texttt{test2.txt}. The bucket mybucket contains no objects
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync . s3://mybucket
+!\outputcommand{upload: test.txt to s3://mybucket/test.txt\\
+upload: test2.txt to s3://mybucket/test2.txt}!
+\end{lstlisting}
+
+\item The following \texttt{sync} command syncs objects under a specified prefix and bucket to objects under another specified prefix and bucket by copying \acrshort{s3} objects. A \acrshort{s3} object will require copying if the sizes of the two \acrshort{s3} objects differ, the last modified time of the source is newer than the last modified time of the destination, or the \acrshort{s3} object does not exist under the specified bucket and prefix destination. In this example, the user syncs the bucket mybucket2 to the bucket mybucket. The bucket mybucket contains the objects \texttt{test.txt} and \texttt{test2.txt}. The bucket mybucket2 contains no objects
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync s3://mybucket s3://mybucket2
+!\outputcommand{
+copy: s3://mybucket/test.txt to s3://mybucket2/test.txt\\
+copy: s3://mybucket/test2.txt to s3://mybucket2/test2.txt}!
+\end{lstlisting}
+
+
+\item The following \texttt{sync} command syncs files in a local directory to objects under a specified prefix and bucket by downloading \acrshort{s3} objects. A \acrshort{s3} object will require downloading if the size of the \acrshort{s3} object differs from the size of the local file, the last modified time of the \acrshort{s3} object is older than the last modified time of the local file, or the \acrshort{s3} object does not exist in the local directory. Take note that when objects are downloaded from \acrshort{s3}, the last modified time of the local file is changed to the last modified time of the \acrshort{s3} object. In this example, the user syncs the current local directory to the bucket mybucket. The bucket mybucket contains the objects \texttt{test.txt} and \texttt{test2.txt}. The current local directory has no files
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync s3://mybucket .
+!\outputcommand{
+download: s3://mybucket/test.txt to test.txt\\
+download: s3://mybucket/test2.txt to test2.txt}!
+\end{lstlisting}
+
+\item The following \texttt{sync} command syncs objects under a specified prefix and bucket to files in a local directory by uploading the local files to \acrshort{s3}. Because the --delete parameter flag is thrown, any files existing under the specified prefix and bucket but not existing in the local directory will be deleted. In this example, the user syncs the bucket mybucket to the local current directory. The local current directory contains the files \texttt{test.txt} and \texttt{test2.txt}. The bucket mybucket contains the object \texttt{test3.txt}
+
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync . s3://mybucket --delete
+!\outputcommand{
+upload: test.txt to s3://mybucket/test.txt\\
+upload: test2.txt to s3://mybucket/test2.txt\\
+delete: s3://mybucket/test3.txt}!
+\end{lstlisting}
+
+\item The following \texttt{sync} command syncs objects under a specified prefix and bucket to files in a local directory by uploading the local files to \acrshort{s3}. Because the --exclude parameter flag is thrown, all files matching the pattern existing both in \acrshort{s3} and locally will be excluded from the sync. In this example, the user syncs the bucket mybucket to the local current directory. The local current directory contains the files test.jpg and \texttt{test2.txt}. The bucket mybucket contains the object \texttt{test.jpg} of a different size than the local \texttt{test.jpg}.
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync . s3://mybucket --exclude "*.jpg"
+!\outputcommand{
+upload: test2.txt to s3://mybucket/test2.txt}!
+\end{lstlisting}
+
+\item The following \texttt{sync} command syncs files under a local directory to objects under a specified prefix and bucket by downloading the local files to \acrshort{s3}. This example uses the --exclude parameter flag to exclude a specified directory and \acrshort{s3} prefix from the sync command. In this example, the user syncs the local current directory to the bucket mybucket. The local current directory contains the files \texttt{test.txt} and another/\texttt{test2.txt}. The bucket mybucket contains the object another/\texttt{test5.txt}.
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ s3 sync s3://mybucket/ . --exclude "*another/*"
+!\outputcommand{
+download: s3://mybucket/test1.txt to test1.txt}!
+\end{lstlisting}
+\end{enumerate}
+\end{itemize}
+
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
 

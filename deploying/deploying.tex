@@ -107,6 +107,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\section*{Web Server in Production Mode}
 
+\section*{no copy-paste!}
+\begin{frame}[fragile]
+\frametitle{no copy-paste!}
+\begin{itemize}
+\item \href{http://www.learncodethehardway.org/}{Learn Code The Hard Way}
+
+
+\emph{``\dots emphasizes precision, attention to detail, and persistence by requiring you to type
+each exercise \alert{(no copy-paste!)} and make it run, as well as to read up on outside topics
+and to return to exercises and ideas that you don’t understand, and understand them.''}
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Web Server in Production Mode}
 Amazon es el mayor proveedor de servicios para la ``nube'' en el mundo muy por delante de Google o Microsoft.
@@ -134,9 +148,9 @@ La metodología consiste en añadir primeramente un usuario para cada aplicació
 \end{itemize}
 \end{frame}
 
-\section{Lauching an Amazon EC2 Instance}
+\section{Launching an Amazon EC2 Instance}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Lauching an Amazon EC2 Instance}
+\frametitle{Launching an Amazon EC2 Instance}
 
 \begin{itemize}
 \item Prepare a Key Pair
@@ -605,9 +619,9 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \end{itemize}
 \end{frame}
 
-\section{Application in Developent and Production Environments}
+\section{Application in Development and Production Environments}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Application in Developent and Production Environments}
+\frametitle{Application in Development and Production Environments}
 \begin{itemize}
 \item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQL}
 
@@ -645,7 +659,7 @@ $ rails server --environment production
 $ curl http://my.public.dns.amazonaws.com:3000
 \end{lstlisting}
 
-Problems? Kill Webrick server and export the ``assests''. 
+Problems? Kill Webrick server and export the ``assets''. 
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
