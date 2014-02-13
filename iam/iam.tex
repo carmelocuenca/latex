@@ -113,9 +113,9 @@
 \section{AWS Identity an Access Management}
 \begin{frame}[fragile]
 \frametitle{AWS Identity an Access Management}
-\acrfull{iam} enables you to control who can do what in your \acrfull{aws} account
+\acrfull{iam} enables you to control \alert{who can do what} in your \acrfull{aws} account
 \begin{itemize}
- \item Users, Groups, Roles, Permissions
+ \item Users, Groups, Permissions
  \item Control
   \begin{itemize}
    \item Centralized
@@ -153,9 +153,9 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Create individual users}
+\section{Users}
 \begin{frame}[fragile]
-\frametitle{Create individual users}
+\frametitle{Users}
 How to steps
 \begin{itemize}
  \item Identify which \acrshort{iam} you want to create
@@ -169,9 +169,8 @@ How to steps
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Users}
 \begin{frame}[fragile]
-\frametitle{Users}
+\frametitle{Create individual users}
 \begin{itemize}
 \item Create a new user
 \begin{itemize}
@@ -209,7 +208,7 @@ How to steps
 \begin{frame}[fragile]
 \frametitle{User Management}
 \begin{itemize}
-\item Add user \texttt{``admin''} to Group \texttt{``Administrator''}
+\item Add user \texttt{``admin''} to Group \texttt{``Administrators''}
 \begin{center}
 \includegraphics[scale=0.15]{addusertogroup.eps}
 \end{center}
@@ -224,7 +223,8 @@ How to steps
 \begin{frame}[fragile]
 \frametitle{IAM User Sign-In URL}
 \begin{itemize}
-\item Navigate to IAM User Sign-In URL  \url{https://perdidita.signin.aws.amazon.com/console}
+\item Create a IAM User Sign-In URL with name ``your-favorite-name''
+\item Navigate to your IAM User Sign-In URL, for example \url{https://perdidita.signin.aws.amazon.com/console}
 \item Sign in as user \texttt{``admin''}
 \begin{columns}
 \column{0.65 \textwidth}
@@ -247,7 +247,6 @@ How to steps
 \begin{itemize}
 \item Create a Group \texttt{``Developers''} with permissions to sign-in and manage \acrshort{ec2} instances
 \item Create a user \texttt{``jsmith''} and include him in the \texttt{``Developers''} Group
-\item Create an \acrshort{iam} User Sing-In URL with an alias
 \item Login in your \acrshort{aws} as \texttt{``jsmith''}
 \end{itemize}
 \end{frame}

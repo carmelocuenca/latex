@@ -1,3 +1,4 @@
+
 \documentclass{beamer}
 \usepackage[british,spanish]{babel}
 \usepackage[utf8]{inputenc}
@@ -21,8 +22,7 @@
 
 \usepackage[normalem]{ulem}
 
-%\usepackage[acronym,xindy,toc]{glossaries}
-
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
 \usepackage[acronym,xindy,toc]{glossaries}
 \makeglossaries
 %\usepackage[xindy]{imakeidx}
@@ -150,7 +150,7 @@ URL
 this low limit, messages should generally be used to pass pointers (for example,
 URLs) to data stored elsewhere. Amazon \acrshort{s3} is often a good place to store data while
 it’s being passed through a complex processing pipeline
-
+certificate
 \item Instead of being automatically deleted, a message retrieved from \acrshort{sqs} becomes
 temporarily invisible so that it’s unable to be retrieved a second time. Once your
 code retrieves a message, you have a certain amount of time—the visibility
@@ -173,8 +173,206 @@ access to each aspect of SQS
 \end{itemize}
 
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Watch Out For \dots}
+\begin{itemize}
+\item \emph{Message Order}\\Because the queue is distributed, there’s no guarantee that SQS will return the
+messages in the same order that they were sent. Your application logic must be
+written so that it avoids relying on receiving messages in any particular order
+\item \emph{Message Delivery}\\ Under very rare circumstances, SQS can return the same message more than
+once. Your application can either treat messages as idempotent (so that pro-
+cessing the same one more than once has no ill affect), or it can store a state
+indicator in another location, such as Amazon SimpleDB.
+\item \emph{Message Sampling}\\When your application asks SQS to return a message from a queue, SQS checks
+a subset of the actual set of servers used to store the queue. If a queue contains
+less than 1,000 items, the first retrieval may return no items but a second one
+will
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Operations}
+As you’ll soon see, the SQS programming model is very simple. You can:
+\begin{itemize}
+\item create and delete queues from your account, and list your queues
+\item send, receive, and delete messages, and change message attributes such as the
+visibility timeout
+\item control a queue’s access permissions on a very fine-grained basis
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Pricing Model}
+\begin{itemize}
+\item \emph{Request}\\You pay \$0.01 (one cent) for every 10,000 SQS requests that you make. This is
+equivalent to a price of \$0.000001 per request. Although the per-request price is very low, you still need to be careful
+\item \emph{Data}\\Your data transfer charges are based on the amount of data transferred in and out
+of SQS. Data transferred into SQS is charged at a rate of \$0.10 per gigabyte. Once
+again, this amount is prorated. Data transferred out of SQS is charged on a sliding
+scale starting at \$0.17 per gigabyte and decreasing with volume, reaching \$0.10 per
+gigabyte for all outgoing data transfer in excess of 150 terabytes per month
+\item There’s no charge for data transferred within a Region
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Programming Amazon SQS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Programming Amazon SQS}
+\begin{itemize}
+\item Creating a Queue
+\item Listing Queues
+\item Inserting Items into Queues
+\item Extracting Items from Queues
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Creating Queues}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/sqs/create_queues.rb
+#
+# Usage: ruby create_queues.rb name1 [name2] ...
+#
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+
+abort "Usage: #{__FILE__} <QUEUE_NAME1> [QUEUE_NAME2] ..." unless ARGV.size != 0
+
+# get an instance of the SQS interface using the default configuration
+sqs = AWS::SQS.new
+
+ARGV.each do |queue|
+  sqs.queues.create queue
+  puts "Created queue #{queue}"
+end
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Listing Queues}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/sqs/list_queues.rb
+#
+# Usage: ruby list_queues.rb
+#
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+	
+# get an instance of the SQS interface using the default configuration
+sqs = AWS::SQS.new
+	
+sqs.queues.each do |queue|
+  puts queue.url
+end
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby sqs/list_queues.rb 
+!\outputcommand{https://sqs.us-east-1.amazonaws.com/015850082106/c\_feed\\
+https://sqs.us-east-1.amazonaws.com/015850082106/c\_image\\
+https://sqs.us-east-1.amazonaws.com/015850082106/c\_parse\\
+https://sqs.us-east-1.amazonaws.com/015850082106/c\_render\\
+https://sqs.us-east-1.amazonaws.com/015850082106/c\_url}!
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Inserting Items into Queues}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/sqs/post_queue.rb
+#
+# Usage: ruby post_queue.rb <QUEUE_NAME>  <MESSAGE1> ...
+#
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+
+(queue_name, *messages) = ARGVcertificate
+abort "Usage: #{__FILE__}  <QUEUE_NAME>  <MESSAGE> ..." unless queue_name && messages.size != 0
+
+# get an instance of the SQS interface using the default configuration
+sqs = AWS::SQS.new
+begin
+  queue = sqs.queues.named queue_name
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+messages.each do |message|
+  queue.send_message message
+  puts "Posted message #{message} to queue #{queue.url}"
+end
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Extracting Items from Queues}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/sqs/post_queue.rb
+#
+# Usage: ruby pull_queue.rb <QUEUE_NAME>
+#
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+
+abort "Usage: #{__FILE__} <QUEUE_NAME>" unless ARGV.size != 0
+
+# get an instance of the SQS interface using the default configuration
+sqs = AWS::SQS.new
+queue_name = ARGV[0]
+begin
+  queue = sqs.queues.named queue_names
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
 
 
+#You can receive messages from the queue 
+# (a) manually with the receive_message + delete_message, iterating while true
+# (b) automatically, using poll that iterates, receive and delete the messages
+#     In case (b) you can set the time to wait between receivings,...
+
+#option (a)
+=begin
+while true
+  queue.receive_message do |message|
+    puts "Body message = #{message.body}"
+    message.delete
+  end
+end
+=end
+
+# option (b)
+queue.poll(:initial_timeout => false,
+           :idle_timeout => 10) { |msg| puts msg.body }
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ ruby sqs/create_queue perdidita
+$ ruby sqs/post_queue.rb perdidita 'Hello World!"
+$ ruby sqs/pull_queue.rb perdiditacertificate
+&\outputcommand{\\
+be patient \dots\\
+Hello World!
+}&
+\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Building a Image Crawler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Homework}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]

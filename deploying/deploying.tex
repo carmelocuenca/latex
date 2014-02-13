@@ -107,9 +107,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\section*{Web Server in Production Mode}
 
-\section*{no copy-paste!}
+\section*{NO COPY-PASTE}
 \begin{frame}[fragile]
-\frametitle{no copy-paste!}
+\frametitle{\alert{NO COPY-PASTE!}}
 \begin{itemize}
 \item \href{http://www.learncodethehardway.org/}{Learn Code The Hard Way}
 
@@ -143,7 +143,7 @@ La metodología consiste en añadir primeramente un usuario para cada aplicació
 
 \item Ya sólo nos faltará desplegar  un servidor porfesional de \acrshort{ror}, nuestra elección para ilustrar ha sido el más complejo de configurar ``unicorn''. Instalaremos Unicorn, comprobaremos que funciona en el entorno de producción y escribiremos un script para lanzarlo como un servicio.
 
-\item Finalmente, el alumno desarrollará un trabajo similar de desplegar cualquier otra aplicación \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mogol) o el despliegue de un gestor de contenidos.
+\item Finalmente, el alumno desarrollará un trabajo similar de desplegar cualquier otra aplicación \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mongol) o el despliegue de un gestor de contenidos.
 
 \end{itemize}
 \end{frame}
@@ -154,7 +154,7 @@ La metodología consiste en añadir primeramente un usuario para cada aplicació
 
 \begin{itemize}
 \item Prepare a Key Pair
-\item Edit ``Security Group'' \includegraphics[width=1.0 \textwidth]{securitygroup.eps}
+\item Create or edit a ``Security Group'' \includegraphics[width=1.0 \textwidth]{securitygroup.eps}
 \item Launch a minimal \texttt{CentOS 6 (i386) - with Updates} in \url{https://aws.amazon.com/marketplace/pp/B00A6KZBC6/ref=sp_mpg_product_title?ie=UTF8&sr=0-2}
 \item Then, we can login in the instance
 
@@ -185,12 +185,13 @@ $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
+# echo "export LANG=en_EN.UTF8" >> ~/.bashrc
+# source ~/.bashrc
 # yum update -y
 \end{lstlisting}
 \item Now that your instance is updated, you can install the Apache web server, MySQL, and PHP software packages. Use the \texttt{yum groupinstall} command to install multiple software packages and all related dependencies at the same time
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-# export LANG=en_EN.utf8
 # yum groupinstall -y "Web Server" "MySQL Database" "PHP Support"
 \end{lstlisting}
 \item Install the php-mysql package
@@ -243,7 +244,7 @@ Since \texttt{newt-python} is required for \texttt{system-config-firewall-tui to
 (\href{http://bugs.centos.org/view.php?id=6877}{http://bugs.centos.org/view.php?id=6877})
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-# yum -y install newt-python 
+# yum install -y newt-python 
 # system-config-firewall-tui
 \end{lstlisting}
 
@@ -332,7 +333,7 @@ $ curl http://my.public.dns.amazonaws.com/phpinfo.php
 \begin{itemize}
 \item Installing wget
 \begin{lstlisting}[escapechar=!]
-# yum -y wget
+# yum install -y wget
 \end{lstlisting}
 
 \item Installing EPEL (Extra Packages for Enterprise Linux) repository 
@@ -367,7 +368,7 @@ $ curl http://my.public.dns.amazonaws.com/phpinfo.php
    \item \texttt{Node.js} is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications
    \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-# yum -y install nodejs
+# yum install -y nodejs
 \end{lstlisting}
   \end{itemize}
 \end{columns}
@@ -375,9 +376,9 @@ $ curl http://my.public.dns.amazonaws.com/phpinfo.php
 
 \end{frame}
 
-\section{PostgresSQL}
+\section{PostgreSQL}
 \begin{frame}[fragile]
-\frametitle{PostgresSQL}
+\frametitle{PostgreSQL}
 
 \begin{columns}
 \column{0.20 \textwidth}
@@ -408,8 +409,8 @@ $ curl http://my.public.dns.amazonaws.com/phpinfo.php
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{PostgresSQL}
 \begin{itemize}
-\item Edit your distributions \texttt{.repo file} located \texttt{/etc/yum.repos.d/CentOS-Base.repo} and located the \texttt{[base]} and \texttt{[updates]} sections.
-To the section(s) identified above, you need to append a line
+\item Edit your distributions \texttt{.repo file} located \texttt{/etc/yum.repos.d/CentOS-Base.repo} and locate the \texttt{[base]} and \texttt{[updates]} sections.
+To the sections identified above, you need to append a line
 
 \lstset{language=shell, escapechar=!,numbers=left}
 \begin{lstlisting}[escapechar=!]
@@ -432,8 +433,7 @@ exclude=postgresql*
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-$ yum list postgresql93-*
-!\outputcommand{A lot of stuff}!
+$ yum grouplist Postgre*
 # yum groupinstall -y "PostgreSQL Database Server 9.3 PGDG"
 # yum install -y postgresql93-devel phpPgAdmin
 \end{lstlisting}
@@ -479,9 +479,9 @@ $ yum list postgresql93-*
 
 \item Create a role with name \texttt{depot\_app} which can create databases, can not create roles, is not superuser and needs a password
 
-\lstset{language=shell, escapechar=!}
+\lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-# su - postgres
+# su -1!~!postgres
 $ createuser -d -R -S -P depot_app
 !\outputcommand{Enter password for new role:}!
 !\outputcommand{Enter it again:}!
@@ -513,9 +513,9 @@ host    all all ::1/128 md5 !\circled{4}!
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texttt{depot\_app} User }
+\section{\texttt{depot\_app} Linux User }
 \begin{frame}[fragile]
-\frametitle{\texttt{depot\_app} User}
+\frametitle{\texttt{depot\_app} Linux User}
 \begin{itemize}
 
 \item Our Rails project (\texttt{depot\_app}) is going to run within a \acrshort{ror} installed via \acrshort{rvm} in the user space. So we will create a new  user with the same name \texttt{depot\_app} for that purpose
@@ -531,7 +531,7 @@ host    all all ::1/128 md5 !\circled{4}!
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Setting Up Rails Environment for\texttt{depot\_app} User}
+\section{Setting Up Rails Environment for \texttt{depot\_app} User}
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Setting Up Rails Environment for \texttt{depot\_app} User}
 \begin{itemize}
@@ -539,7 +539,7 @@ host    all all ::1/128 md5 !\circled{4}!
 \item Test Apache UserDir in user \texttt{depot\_app}
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=&]
-# su - depot_app
+# su -&~&depot_app
 $ chmod 0711 /home/depot_app
 $ mkdir public_html
 $ chmod +rx public_html
@@ -559,7 +559,7 @@ $ curl http://my.public.dns.amazonaws.com/~depot_app
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-# su - depot_app
+# su -!~!depot_app
 $ \curl -L https://get.rvm.io | bash
 !\outputcommand{A lot of stuff}!
 $ source /home/depot_app/.rvm/scripts/rvm
@@ -680,12 +680,12 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \begin{frame}[fragile]
 \frametitle{Professional Web Server in Production Environment}
 
-\begin{tabular}{cl}
- & Webrick \\
- & Mongrel in \href{https://mongrel.rubyforge.org}{https://mongrel.rubyforge.org}\\
-\includegraphics[width=0.15 \textwidth]{unicorn.eps} & Unicorn in \href{https://github.com/depot/517-unicorn}{https://github.com/depot/517-unicorn} \\ 
-\includegraphics[width=0.15 \textwidth]{passenger.eps} & Passenger in \href{https://www.phusionpassenger.com/}{https://www.phusionpassenger.com/} \\ 
-\includegraphics[width=0.15\textwidth]{thin.eps}  & Thin in \href{https://code.macournoyer.com/thin/}{https://code.macournoyer.com/thin/} \\ 
+\begin{tabular}{|c|l|} \hline
+ & Webrick \\ \hline
+ & Mongrel in \href{https://mongrel.rubyforge.org}{https://mongrel.rubyforge.org}\\ \hline
+\includegraphics[width=0.15 \textwidth]{unicorn.eps} & Unicorn in \href{https://github.com/depot/517-unicorn}{https://github.com/depot/517-unicorn} \\ \hline
+\includegraphics[width=0.15 \textwidth]{passenger.eps} & Passenger in \href{https://www.phusionpassenger.com/}{https://www.phusionpassenger.com/} \\ \hline
+\includegraphics[width=0.15\textwidth]{thin.eps}  & Thin in \href{https://code.macournoyer.com/thin/}{https://code.macournoyer.com/thin/} \\ \hline
 \end{tabular}
 
 
@@ -769,7 +769,7 @@ $ unicorn -E production -p 3000
 \end{lstlisting}
 
 \begin{block}{Warning!}
-  localhost is ``perdidita''
+  localhost is your ``perdidita''
 \end{block}
 
 \item Then run \texttt{curl} in your \alert{localhost} in order to test it
@@ -913,9 +913,9 @@ $ curl http://depot_app.com
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Homeworks}
+\section{Homework}
 \begin{frame}
-  \frametitle{Homeworks}
+  \frametitle{Homework}
   \begin{itemize}
     \item Deployment a Rails Application with Mongrel, Passenger or Thin
     \item Start Up PhpPgAdmin tool
