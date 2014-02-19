@@ -1,0 +1,660 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{multirow}
+
+
+
+\usepackage{listings}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+\newcommand{\comment}[2]{#2}
+
+\graphicspath{ {./images/} }
+
+\title[Cloud Computing with Amazon Web Services]{Puppet}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{images/awslogo.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  %\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  \tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+
+\selectlanguage{british}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{ebs}{EBS}{Elastic Block Storage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{ecu}{ECU}{Elastic Compute Unit}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Puppet}
+\begin{itemize}
+\item \url{http://puppetlabs.com/}
+\item Puppet lets you describe configuration in terms of resources—what things should exist—and
+their attributes. You don't have to get into the details of how resources are created and
+configured on different platforms. Puppet just takes care of it
+\item Here are some of the kinds of resources you can describe in Puppet
+\begin{itemize}
+\item Packages, Files, Services, Users, Groups, YUM repos, Nagios configuration, Log messages, /etc/hosts entries, Network interfaces, SSH keys,
+SELinux settings, Kerberos configuration, ZFS attributes, E-mail aliases, Mailing lists, Mounted filesystems,
+Scheduled jobs, VLANs, Solaris zones
+\end{itemize}
+\item The Puppet advantage
+\begin{itemize}
+\item You can write a manifest once and apply it to many machines, avoiding
+duplicated work
+\item You can keep all your servers in sync with each other, and with the manifest
+\item The Puppet manifest also acts as live documentation, which is guaranteed to
+be up to date
+\item Puppet copes with differences between operating systems, platforms, command
+syntaxes, and so on
+\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Up and Running}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Up and Running}
+\url{http://docs.puppetlabs.com/guides/puppetlabs_package_repositories.html#for-red-hat-enterprise-linux-and-derivatives}
+
+\begin{itemize}
+\item To enable the repository, run the command below that corresponds to your OS version and architecture:
+\begin{itemize}
+ \item Enterprise Linux 6 i386
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ sudo rpm -ivh https://yum.puppetlabs.com/el/6/products/i386/puppetlabs-release-6-7.noarch.rpm
+\end{lstlisting}
+
+\item Enterprise Linux 6 x86\_64
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ sudo rpm -ivh https://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+\end{lstlisting}
+\end{itemize}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ sudo yum install puppet facter -y
+$ puppet --version
+!\outputcommand{3.4.2}!
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hello World}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Hello World!}
+\begin{columns}
+\column{ 0.5 \textwidth}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# site.pp
+file { '/tmp/hello.text':
+  content => 'Hello World!',
+}
+\end{lstlisting}
+\column{ 0.5 \textwidth}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+RESOURCE { NAME:
+  ATTRIBUTE => VALUE,
+  !\dots!
+}
+\end{lstlisting}
+\end{columns}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ puppet apply site.pp
+&\outputcommand{Notice: Compiled catalog for ponderosa.lan in environment production in 0.35 seconds\\
+Notice: /Stage[main]/Main/File[/tmp/hello.text]/ensure: defined content as '{md5}bcdad52d22f1510b7c9389176f80f4fa'\\
+Notice: Finished catalog run in 0.28 seconds}&
+$ cat /tmp/hello.txt
+&\outputcommand{Hello World!}&
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ puppet apply site.pp
+&\outputcommand{Notice: Compiled catalog for ponderosa.lan in environment production in 0.25 seconds\\
+Notice: Finished catalog run in 0.20 seconds\\
+}&
+$ cat /tmp/hello.txt
+&\outputcommand{Hello World!}&
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ echo 'Goodbye' > /tmp/hello.txt
+$ puppet apply site.pp
+&\outputcommand{Notice: Compiled catalog for ponderosa.lan in environment production in 0.23 seconds\\
+Notice: /Stage[main]/Main/File[/tmp/hello.text]/content: content changed '{md5}a05945549d7a0eda92c8a1755587346a' to '{md5}bcdad52d22f1510b7c9389176f80f4fa'\\
+Notice: Finished catalog run in 0.25 seconds}&
+$ cat /tmp/hello.txt
+&\outputcommand{Hello World!}&
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nodes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Nodes}
+\begin{itemize}
+\item Creating a directory structure
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ cd
+$ mkdir -p puppet/manifests
+$ mv site.pp puppet/manifests
+$ puppet apply manifests/site.pp
+\end{lstlisting}
+
+\item ``node'' is the Puppet term for an individual machine that has a Puppet configuration
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+node NODENAME {
+  RESOURCE
+  RESOURCE
+  &\dots&
+}
+\end{lstlisting}
+\item Here ``NODENAME'' is the hostname of the relevant machine, and ``RESOURCE'' is a resource
+declaration
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Creating a node declaration}
+\begin{itemize}
+\item Create the file \texttt{manifests/nodes.pp} with the following contents
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# manifests/nodes.pp
+
+node 'ponderosa' {
+  file { '/tmp/hello.txt':
+    content => 'Hello World!',
+  }
+}
+\end{lstlisting}
+\item Change the manifests/site.pp file so it contains:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# manifest/site.pp
+
+import 'nodes.pp'
+\end{lstlisting}
+
+\item Check whether everything still works:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ puppet apply manifests/site.pp
+\end{lstlisting}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Packages, Files and Services}
+
+\begin{frame}[fragile]
+\frametitle{Packages}
+\begin{itemize}
+ \item Installing Apache
+\begin{itemize}
+\item Edit the file \texttt{manifests/nodes.pp} with the following contents
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# manifests/nodes.pp
+
+node 'ponderosa' {
+  package { 'httpd':
+    ensure => installed, # absent
+  }
+}
+\end{lstlisting}
+where there are a type of resource: ``package'', the name of the instance: ``nginx'', and a list of attributes
+\item Apply your manifest
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo puppet apply manifests/site.pp 
+\end{lstlisting}
+\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Modules}
+\begin{itemize}
+\item To make your Puppet manifests more readable and maintainable, it's a good idea to arrange
+them into modules. A Puppet module is a way of grouping related resources
+\item In our example, we're going to make an htppd module that will contain all Puppet code relating to httpd
+
+\item Create the directory \texttt{modules/httpd/manifests/init.pp}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ mkdir -p modules/httpd/{manifests,files,templates}
+\end{lstlisting}
+
+\item Create the file modules/httpd/manifests/init.pp with the following
+contents
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# modules/httpd/manifests/init.pp
+
+# Manage httpd webserver
+class httpd {
+  package { 'httpd':
+    ensure => installed, # absent
+  }
+}
+\end{lstlisting}
+
+\item Edit the \texttt{manifests/nodes.pp} file as follows:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# manifests/nodes.pp
+
+node 'ponderosa' {
+  include httpd
+}
+\end{lstlisting}
+
+\item Run Puppet to make sure everything is correct. There should be no changes
+\begin{lstlisting}[escapechar=&]
+$ sudo puppet apply --modulepath=${HOME}/puppet/modules manifests/site.pp
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Services}
+\begin{itemize}
+\item So we're using a module to manage httpd on the server. That's great, but so far we've only
+installed the httpd package. In order to run the web server, we would need to start and stop
+it manually using the command line. Fortunately, we can automate this with Puppet as well
+
+\item Edit the file \texttt{modules/httpd/manifests/init.pp} with the following
+contents
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# modules/httpd/manifests/init.pp
+
+# Manage httpd webserver
+class httpd {
+  package { 'nginx':
+    ensure => absent,
+  }
+
+  package { 'httpd':
+    ensure => installed, # absent
+    require => Package['nginx'],
+  }
+
+  service { 'httpd':
+    enable => true, # Setting enable => true will configure the service to start at boot time
+    ensure => running,
+    require => Package['httpd'],
+  }
+}
+\end{lstlisting}
+
+\item Run Puppet to make sure everything is correct. There should be no changes
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo puppet apply --modulepath=${HOME}/puppet/modules manifests/site.pp
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{More about Services}
+\begin{itemize}
+\item Service status options
+\begin{itemize}
+\item Puppet will use the service's own control script to determine whether the service is running,
+by calling service SERVICENAME status (at least on UNIX-like systems)
+\item If a service's control script doesn't support a status command, you can set hasstatus \texttt{=>}
+false for the service resource. In this case, Puppet will look in the system process table to
+see if the service is running
+\item If you need Puppet to search the process table for something other than the service's name,
+you can specify what to search for using the pattern attribute.
+\item If searching the process table won't work, you can provide a command for Puppet to use to
+determine the service's status, using the status attribute
+\end{itemize}
+\item Service control commands
+\begin{itemize}
+\item If you want to restart a service some other way than just stopping and starting the service,
+you can give Puppet the command you want to use via the restart attribute.
+\item You can also specify custom service start and stop commands using the start and
+stop attributes
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Files}
+\begin{itemize}
+\item We have to have Puppet install a config file on the server to define \texttt{/etc/httpd/conf/httpd.conf}
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ mkdir -p modules/httpd/files/etc/httpd/conf/
+$ cp /etc/httpd/conf/httpd.conf modules/httpd/files/etc/httpd/conf
+$ sudo touch /etc/httpd/conf/httpd.conf
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# modules/httpd/manifests/init.pp
+
+# Manage httpd webserver
+class httpd {
+  package { 'nginx':
+    ensure => absent,
+  }
+
+  package { 'httpd':
+    ensure => installed, # absent
+    require => Package['nginx'],
+  }
+
+  service { 'httpd':
+    enable => true, # Setting enable => true will configure the service to start at boot time
+    ensure => running,
+    require => Package['httpd'],
+  }
+
+  file { "/etc/httpd/conf/httpd.conf":
+    owner => "root",
+    group => "root",
+    mode => 0640,
+    # "puppet://$puppetserver/modules/httpd/etc/httpd/httpd.conf",
+    source => 'puppet:///modules/httpd/etc/httpd/conf/httpd.conf',
+    require => Package['httpd'],
+    notify => Service['httpd'],
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[escapechar=&]
+$ sudo puppet apply --modulepath=${HOME}/puppet/modules manifests/site.p
+&\outputcommand{Notice: Compiled catalog for ponderosa.lan in environment production in 0.80 seconds\\
+Notice: /Stage[main]/Httpd/File[/etc/httpd/conf/httpd.conf]/mode: mode changed '0644' to '0640'\\
+Notice: /Stage[main]/Httpd/Service[httpd]/ensure: ensure changed 'stopped' to 'running'\\
+Notice: Finished catalog run in 2.19 seconds}&
+\end{lstlisting}
+
+\item  We have to have Puppet install a greeting file on the server to define \texttt{/var/www/html/index.html}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ mkdir -p modules/httpd/files/var/www/html/
+$ cp echo 'Hello World! in /var/www/html/index.htlm' > modules/httpd/files/var/www/html/index.html
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+# modules/httpd/manifests/init.pp
+&\vdots&
+  file { "/var/www/html/index.html":
+    owner => "root",
+    group => "root",
+    mode => 0644,
+    source => 'puppet:///modules/httpd/var/www/html/index.html',
+    require => Package['httpd'],
+  }
+}
+\end{lstlisting}
+
+\item Aplly the manifests and curl the localhost
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo puppet apply --modulepath=${HOME}/puppet/modules manifests/site.p
+$ curl http://localhost/index.html
+\end{lstlisting}
+
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{The package–file–service pattern}
+\begin{itemize}
+\item The pattern you've just learnt is a very useful one. It'll cover most services that you
+need to automate
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+class THE_STUFF {
+  package { THE_STUFF:
+    ensure => installed,
+  }
+  service { THE_STUFF:
+    ensure => running,
+   require => Package[THE_STUFF],
+  }
+  file { '/etc/THE_STUFF.conf':
+    source => 'puppet:///modules/THE_STUFF/THE_STUFF.conf',
+    notify => Service[THE_STUFF],
+  }
+}
+\end{lstlisting}
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Managing Puppet with Git}
+\begin{frame}[fragile]
+\frametitle{Managing Puppet with  Git}
+\begin{itemize}
+\item Create and commit git repository
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ cd ~/puppet
+$ git init
+$ git add .
+$ git commit -a -m "Initial commit"
+\end{lstlisting}
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Distributing Puppet Manifests}
+\begin{itemize}
+\item To manage several servers at once, we need to distribute
+the Puppet manifests to each machine so that they can be applied
+\item There are several ways to do this, and Puppet has a built-in server capability (Puppetmaster) or using Git to distribute the manifests
+\begin{itemize}
+\item Reliability. You will still be able to run
+Puppet on all your client machines and push changes to them using Git
+\item Scalability. You can keep on adding machines indefinitely, and each one looks after itself. By contrast, using
+a Puppetmaster moves all the workload of compiling manifests from the client machine to a
+single server, which places heavy demands on that server as the network grows
+\item Simplicity (``what's simple to you depends on what you already know''
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Creating a master Git repo}
+
+\begin{itemize}
+ \item We're going to make a copy of our existing Puppet repo, which we can then clone on
+a new machine.
+\begin{enumerate}
+\item Create a directory to hold the repo
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo mkdir /var/git
+\end{lstlisting}
+
+\item Clone the repo, using the --bare flag:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ cd /var/git
+$ sudo git clone --bare ~/puppet
+&\outputcommand{Cloning into bare repository 'puppet.git'...
+done.}&
+\end{lstlisting}
+
+\item Now create a git user that will own the master repo and control access to it:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo adduser -d /var/git git
+$ sudo chown -R git:git /var/git
+\end{lstlisting}
+
+\item Just to verify that these steps have worked, check out a temporary clone of the
+master repo:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ cd /tmp
+$ git clone /var/git/puppet.git
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ ls puppet
+&\outputcommand{manifests modules}&
+$ rm -rf puppet
+\end{lstlisting}
+
+\item Now create a secure shell (SSH) keypair for the git user so that it can log in
+from remote machines to clone and update the Git repo. When prompted for a
+passphrase, just hit Enter.
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo su - git
+$ ssh-keygen
+&\outputcommand{A lot of questions and stuff \dots }&
+\end{lstlisting}
+
+\item Create an authorized\_keys file for git containing the public key you just generated:
+\begin{lstlisting}[escapechar=&]
+$ cd .ssh
+$ ls
+$ cp id_rsa.pub authorized_keys
+\end{lstlisting}
+
+\item You should now be able to log into the git account via SSH using this key:
+\begin{lstlisting}[escapechar=&]
+$ ssh git@localhost
+&\outputcommand{The authenticity of host 'localhost (::1)' can't be established.\\
+RSA key fingerprint is 4f:f8:8f:54:82:35:84:7f:c5:d3:89:53:2a:bc:a4:ad.\\
+Are you sure you want to continue connecting (yes/no)? yes\\
+Warning: Permanently added 'localhost' (RSA) to the list of known hosts}
+\end{lstlisting}
+
+\end{enumerate}
+\end{itemize}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Cloning the repo a new a machine}
+\begin{itemize}
+\item You'll need a second machine similar to the one you have been using so far (either a cloud
+instance (EC2), a Vagrant VM, or a physical machine, whichever is convenient)
+\item Install Puppet and its dependencies
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+

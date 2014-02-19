@@ -91,23 +91,10 @@
 \newacronym{s3}{S3}{Simple Storage Service}
 \newacronym{sqs}{SQS}{Amazon Simple Queue Service}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Scaling with Amazon Web Services}
-\begin{frame}[fragile]
-\frametitle{Scaling with Amazon Web Services}
-\begin{itemize}
- \item All you need \dots
- \begin{itemize}
-   \item A desktop or laptop (with Internet access, of course)
-   \item A credit card (for setting up an AWS account)
-   \item A phone (to complete the registration process)
-   \item \acrfull{rds}, \acrfull{elb}, \acrfull{ami}, CloudWatch, AutoScaling 
- \end{itemize}
-\end{itemize}
-
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Scaling with Amazon Web Services}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Choosing an Architecture}
+\frametitle{Scaling with Amazon Web Services}
 
 \begin{columns}
 \column{0.5 \textwidth}
@@ -152,17 +139,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{DB Security Groups}
-It is a good idea to create a DB security group. You can create the DB security group through the AWS Console and add the authorizations.
-An authorization is a security group from an EC2 account that allows you to
-share RDS instances easily across multiple accounts. Alternatively, you can specify a
-CIDR/IP, much like we did for the EC2 security groups. For now, we will allow everyone
-access to the DB instances in this group. Later, we’ll restrict that access again. You can
-add a DB instance to multiple DB security groups, giving you the necessary flexibility
-in case you work with multiple EC2 accounts
+\begin{itemize}
+\item Create a DB security group through the AWS Console and add the authorizations (as you did when you created your EC2 instances)
+\item For now, we will allow everyone access to the DB instances in this group. Later, we’ll restrict that access again
+\item Use port number \texttt{5432}
+\end{itemize}
 
-\begin{center}
-      \includegraphics[scale=0.25]{securitydb.eps}
-\end{center}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
@@ -184,7 +166,7 @@ in case you work with multiple EC2 accounts
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Test a \acrshort{rds} Instance}
 \begin{itemize}
- \item Test with a PostgreSQL client a \acrshort{rds} instance
+ \item \texttt{pgsql} is a PostreSQL client. Test with it your \acrshort{rds} instance 
  \lstset{language=shell, breaklines=true}
   \begin{lstlisting}[escapechar=!]
   $ psql -W -h depot-app-production.ccoguny6ikux.us-east-1.rds.amazonaws.com  depot_app_production depot_app
@@ -192,6 +174,7 @@ in case you work with multiple EC2 accounts
 psql (9.3.2, servidor 9.3.1)\\
 \dots}!
  \end{lstlisting}
+\item Use \texttt{$\backslash q$} command to exit 
  \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -201,9 +184,9 @@ psql (9.3.2, servidor 9.3.1)\\
 \item Start and login in the \acrshort{ec2} instance
 
 \lstset{language=shell, escapechar=!}
-\begin{lstlisting}[escapechar=!]
+\begin{lstlisting}
 $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
-# su - depot_app
+# su -  depot_app
 \end{lstlisting}
 
 \item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQL} \acrshort{rds}
@@ -255,7 +238,9 @@ $ curl http://my.public.dns.amazonaws.com:5000
 
  \end{itemize}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\comment{
 \section{Web Server Benchmarking}
 \begin{frame}[fragile]
 \frametitle{Web Server Benchmarking}
@@ -272,6 +257,7 @@ $ ab -n request -c concurrency [http[s]://]hostname[:port]/path
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Testing a Web Application}
 \begin{itemize}
@@ -317,6 +303,7 @@ $ tail -f log/production.log log/unicorn.std*
 \end{itemize}
 
 \end{frame}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -380,17 +367,17 @@ result, an \acrshort{elb} is not referenced by an IP address, but by a fully qua
 \begin{enumerate}	
 \item Summary
 \begin{center}
-\includegraphics[scale=0.3]{createaelb2.png}
+\includegraphics[scale=0.2]{createelb3.jpg}
 \end{center}
 \item Define Load Balancer
 \begin{center}
-\includegraphics[scale=0.3]{readytocreate.png}
+\includegraphics[scale=0.2]{define-load-balancer.jpg}
 \end{center}	
-\item Configure Health Check
+\item Configure Health Check (\alert{Use protocol TCP and set \texttt{Healthy Threshold:} to 4})
 \begin{center}
-\includegraphics[scale=0.3]{createaelb0.png}
+\includegraphics[scale=0.2]{createelb1.jpg}
 \end{center}
-\item Add \acrshort{ec2} instances
+\item Add \acrshort{ec2} instances (\alert{Instances should be launched in the same zone})
 \begin{center}
 \includegraphics[scale=0.25]{createaelb1.png}
 \end{center}	
@@ -432,12 +419,26 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
  \item Predictably according to a schedule defined by you (for example, every Friday at 13:00:00)
 \end{itemize}
 
-\end{itemize}
 
+
+\pagebreak
+
+\item You need to configure your autoscaling:
+
+\begin{columns}
+\column{0.7 \textwidth}
+\begin{enumerate}
+\item Create a launch configuration. First, define a template that your Auto Scaling group will use to launch instances
+\item Create a autoscaling group. Your group will maintain this number of instances, and replace any that become unhealthy or impaired.
+You can optionally configure your group to adjust in capacity according to demand, in response to Amazon CloudWatch metrics
+\end{enumerate}
+\column{0.3 \textwidth}
 \begin{center}
- \item \includegraphics[scale=0.4]{AS-WorkFlow.eps}
+ \item \includegraphics[scale=0.2]{AS-WorkFlow.eps}
 \end{center}
+\end{columns}
 
+\end{itemize}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -452,6 +453,7 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
 \item Review
 \end{enumerate}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Auto Scaling Group}
@@ -459,17 +461,20 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
 \includegraphics[scale=0.30]{review-autoscale.png}
 \end{center}
 \begin{enumerate}
-\item Configure Auto Scaling group details'
+\item Configure Auto Scaling group details'\\
+\alert{Don't forget to tick ``Receive traffic from Elastic Load Balancer'' and set it properly}\\
+\alert{Don't forget to choose an instace zone}
 \begin{center}
-\includegraphics[scale=0.30]{create-auto-scaling01.png}
+\includegraphics[scale=0.20]{create-auto-scaling01.png}
 \end{center}
-\item Configure scaling policies 
+\item Configure scaling policies. Define two alarms: \texttt{CPUUtilization >= 50 for 60 seconds} and \texttt{CPUUtilization <= 25 for 60 seconds}
 \begin{center}
 \includegraphics[scale=0.25]{configure-scaling-policies.png}
 \end{center}
 \item Configure Notifications (successful launch of an instance, failed instance launch, instance termination, failed instance termination \dots)
 \item Review
 \end{enumerate}
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -478,7 +483,7 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
 
 \lstset{language=shell}
 \begin{itemize}
- \item Use JMeter to define a web load and check that the AutoScaling Group work properly
+ \item We have to define a web load and check that the AutoScaling Group work properly
 \begin{center}
 \includegraphics[scale=0.45]{autoscalingwork.png}
 \end{center}
@@ -486,7 +491,76 @@ $ curl http://depot-app-1557778043.us-east-1.elb.amazonaws.com: 2>/dev/null | gr
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Web Server Benchmarking}
+\begin{frame}[fragile]
+\frametitle{Web Server Benchmarking}
+\begin{itemize}
+  \item Web Sites: \url{WebPageTest.org}
+  \item Apache  \texttt{JMeter} suite
+  \item Commands:  \texttt{httperf}, \texttt{ab} (Apache Bench)
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ab -n request -c concurrency [http[s]://]hostname[:port]/path
+\end{lstlisting}
+   \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Testing a Web Application}
+\begin{itemize}
+\comment{
+\item Tail user the Apachelog files  as \texttt{root}  in \acrshort{ec2} in order to check Apache Server
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+# tail -f /var/log/httpd/depot_app*
+\end{lstlisting}
+\includegraphics[scale=0.15]{logapache.eps}
+
+\item Tail the Unicorn log files as \texttt{depot\_app} in \acrshort{ec2} in order to check Unicorn Server
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ tail -f log/production.log log/unicorn.std*
+\end{lstlisting}
+\includegraphics[scale=0.15]{lograils.eps}
+}
+\item Run JMeter (More info in \url{http://jmeter.apache.org/index.html}) and create a test plan
+
+
+\begin{enumerate}
+\item Right-click on the Test Plan node and choose \texttt{Añadir - Hilos (Usuarios) - Grupo de Hilos}
+\item Configure the thread group with 120 threads, a ramp-up period of 360 seconds (6 minutes), and a loop count of 1
+\item Right-click on the new Thread Group node and choose \texttt{Añadir - Muestreador - Petición HTTP}
+\item Enter your elastic load balancer  name  ( omit the \texttt{http://} protocol prefix) and set port (80  should be fine)
+\item Enter \texttt{``/''} for the path to retrieve the home page from the site
+\item Right-click on the Test Pl an node once again. Add the following listener nodes: \texttt{Gráfico de resultados, Informe Agregado, and Generar Resumen de Resultados}
+
+\end{enumerate}
+
+\begin{center}
+\includegraphics[scale=0.15]{plandeprueba.eps}
+\end{center}
+\begin{center}
+\includegraphics[scale=0.15]{plandeprueba1.eps}
+\end{center}
+
+
+\item Monitoring results and CloudWatch metrics in the ``Monitoring Tab''
+\begin{center}
+\includegraphics[scale=0.15]{plandeprueba2.eps}
+\end{center}
+\comment{
+\begin{center}
+\includegraphics[scale=0.15]{cpuutilization.png}
+\end{center}
+}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Homework}
 \begin{frame}[fragile]
 \frametitle{Homework}
