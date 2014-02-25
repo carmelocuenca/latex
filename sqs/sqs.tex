@@ -18,11 +18,11 @@
 
 \usepackage{tikz}
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
-            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+            \node[shape=circle,draw,inner sep=1pt] (char) {#1};}}
 
 \usepackage[normalem]{ulem}
 
-\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1|}}
 \usepackage[acronym,xindy,toc]{glossaries}
 \makeglossaries
 %\usepackage[xindy]{imakeidx}
@@ -373,6 +373,458 @@ Hello World!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Building a Image Crawler}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Building a Image Crawler}
+
+\begin{center}
+ \includegraphics[ width= 0.5 \textwidth]{image-crawler.jpg}
+\end{center}
+
+
+\begin{itemize}
+\item The application will be an image crawler:
+\begin{enumerate}
+\item Given the URL of a web page, the crawler
+will download the page and store it in Amazon S3
+\item It will then parse the page, looking for HTML image tags, downloading all the images on the page to S3, and
+scaling them to a common size
+\item After all the images on the page have been downloaded, they’ll be used to draw a single, composite image. The composite image
+will contain all the scaled images from the original page.
+\end{enumerate}
+\end{itemize}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ ruby sqs/create_queue perdidita
+$ ruby sqs/post_queue.rb perdidita 'Hello World!"
+$ ruby sqs/pull_queue.rb perdiditacertificate
+&\outputcommand{\\
+be patient \dots\\
+Hello World!
+}&
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Definitions and Utility Functions}
+
+\lstset{language=Ruby, style=eclipse}
+
+\begin{itemize}
+\item Because each queue will be referenced by several processes, let’s define some symbolic names for them in a new  book.inc.php file:
+
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/crawler/book.inc.rb
+#
+# This file define constant to crawler application
+
+URL_QUEUE = 'c_url'
+PARSE_QUEUE = 'c_parse'
+IMAGE_QUEUE = 'c_image'
+RENDER_QUEUE = 'c_render'
+\end{lstlisting}
+
+\end{itemize}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Crawl Loader Command}
+
+\begin{itemize}
+\item We need a way to load a URL into the first stage of the pipeline. Here’s a command
+line tool to do just that:
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/crawler/load_crawl_urls.rb
+#
+
+require File.expand_path("#{File.dirname(__FILE__)}/../config")
+require File.expand_path("#{File.dirname(__FILE__)}/book.inc")
+
+abort "Usage: #{__FILE__} <URL(s)>" unless ARGV.size != 0
+
+# get an instance of the SQS interface using the default configuration
+sqs = AWS::SQS.new
+
+# get the queue whose name is URL_QUEUE
+begin
+  queue = sqs.queues.named URL_QUEUE
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+# for each url in the command line, build the message, encode it to JSON,
+# send it to queue c_url
+ARGV.each do |url|
+  message = {action: 'Fetchpage',
+             origin: __FILE__,
+             data: url,
+             history: "Posted by #{__FILE__} at #{Time.now}"}.to_json
+  begin
+    queue.send_message message
+    puts "Posted message #{message} to queue #{queue.url}"
+  rescue
+    puts "#{$!.class}: #{$!.message}"
+  end
+end
+\end{lstlisting}
+
+
+\item The URL and some additional information are bundled as an array. We then call
+the json\_encode function to convert the array into a JSON value (the message
+stored in the variable \texttt{message}) and the send\_message method to post it to the
+\texttt{URL\_QUEUE queue}
+
+\item Here’s how to use this tool:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby crawler/load\_crawl\_urls.rb http://www.freedigitalphotos.net/images/People\_g40.html http://www.sxc.hu/category/115 http://www.stockfreeimages.com/c1/it-c/connectivity.html http://www.turbophoto.com/Sports.html
+!\outputcommand{Posted message \{"action":"Fetchpage","origin":"crawler/load\_crawl\_urls.rb","data":"http://www.freedigitalphotos.net/images/People\_g40.html","history":"Posted by crawler/load\_crawl\_urls.rb at 2014-02-24 10:47:22 +0000"\} to queue https://sqs.us-east-1.amazonaws.com/015850082106/c\_url\\
+\dots}!
+\end{lstlisting}
+
+\end{itemize}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{The Feed Processing Pipeline}
+\begin{itemize}
+\item Now we have the tools needed to implement the four stages of our processing
+pipeline:
+\begin{enumerate}
+\item fetch the HTML
+\item parse the HTML and extract the image URLs
+\item fetch the images and create thumbnails
+\item render the final mosaic image
+\end{enumerate}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Stage 1 - Fetching the HTML}
+
+\begin{itemize}
+ \item This stage is fairly simple. It pulls a URL from the \texttt{URL\_QUEUE} queue and fetches the
+HTML at the URL. It stores the HTML in Amazon S3 and then passes the work along
+to the next stage in the pipeline by writing a message to the \texttt{PARSE\_QUEUE} queue
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/crawler/fetch_page.rb
+#
+
+require 'net/http'
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+require File.expand_path("#{File.dirname(__FILE__)}/../s3/book.inc")
+
+# get an instance of the SQS and S3 interfaces using the default configuration
+sqs = AWS::SQS.new
+s3 = AWS::S3.new
+
+begin
+  sqs.queues.create URL_QUEUE
+  queue_in = sqs.queues.named URL_QUEUE
+  sqs.queues.create PARSE_QUEUE
+  queue_out = sqs.queues.named PARSE_QUEUE
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+bucket = s3.buckets.create BOOK_BUCKET
+abort "Error creating #{bucket_name} bucket" unless bucket.exists?
+
+# Receive messages from the url queue (forever loop)
+queue_in.poll do |msg|
+  page_url = JSON.parse(msg.body)['data']  # &\circled{1}&
+  puts "Processing URL: #{page_url}"
+  web_contents  = Net::HTTP.get(URI.parse(page_url))  # &\circled{2}&
+  puts "Retrieved #{web_contents.length} bytes of HTML"
+  key = 'page_' + Digest::MD5.hexdigest(page_url) + '.html' # &\circled{3}&
+  if upload_object( s3, bucket, key, web_contents, 'text/html' )
+    puts "Uploaded page to S3 as #{key}"
+
+    message = {action: 'ParsePage',
+               origin: __FILE__,
+               page_url: page_url,
+               data: "http://s3.amazonaws.com/#{BOOK_BUCKET}/#{key}",
+               history: "Posted by #{__FILE__} at #{Time.now}"}.to_json # &\circled{1}&
+    begin
+      queue_out.send_message message
+      puts "Posted message #{message} to queue #{queue_out.url}"
+    rescue
+      puts "#{$!.class}: #{$!.message}"
+    end
+  else
+    puts 'Error uploading HTML to S3'
+  end
+end
+\end{lstlisting}
+
+\item Here’s how to use this tool:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby crawler/fetch_page.rb
+!\outputcommand{
+Processing URL: http://www.sxc.hu/category/115\\
+Retrieved 42550 bytes of HTML\\
+Uploaded page to S3 as page\_bb06539925ead884f75663edbccecba5.html\\
+Posted message\\ {"action":"ParsePage","origin":"crawler/fetch\_page.rb","page\_url":"http://www.sxc.hu/category/115","data":"http://s3.amazonaws.com/developing\_cloud\_application\_bucket/page\_bb06539925ead884f75663edbccecba5.html","history":"Posted by crawler/fetch\_page.rb at 2014-02-24 12:21:56 +0000"} to queue\\ https://sqs.us-east-1.amazonaws.com/015850082106/c\_parse\\
+!\dots!}
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Stage 2 - Parsing HTML and Extracting Image URLs}
+\begin{itemize}
+\item This stage pulls the raw HTML from
+S3, parses it using a third-party HTML parser, extracts some of the image links, and
+passes those links on to the next stage
+\item To simplify this example, we’ll only process images that have an relative URL
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/crawler/parse_page.rb
+#
+
+require 'nokogiri'
+require 'open-uri'
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SQS using the default configuration
+sqs = AWS::SQS.new
+
+begin
+  sqs.queues.create PARSE_QUEUE
+  queue_in = sqs.queues.named PARSE_QUEUE
+  sqs.queues.create IMAGE_QUEUE
+  queue_out = sqs.queues.named IMAGE_QUEUE
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+# Receive messages from the parse queue (forever loop)
+queue_in.poll do |msg|
+  s3_page_url = JSON.parse(msg.body)['data']
+  page_url = JSON.parse(msg.body)['page_url']
+
+  puts "Processing URL: #{s3_page_url} with original #{page_url}"
+
+  img_urls = []
+  doc = Nokogiri::HTML(open(s3_page_url).read)
+  doc.css('//img/@src').each do |link|  # &\circled{1}&
+    # catching images with relative paths and building the full path
+    img_urls << URI.escape(URI.parse(page_url).scheme + '://' + URI.parse(page_url).host + '/' + link.content)  # &\circled{2}&
+  end
+  puts "Processing image #{img_urls}"
+  if img_urls.length != 0
+    message = {action: 'FetchImages',
+               origin: __FILE__,
+               data: img_urls,
+               history: "Posted by #{__FILE__} at #{Time.now}",
+               title: doc.css('title').text}.to_json
+    begin
+      queue_out.send_message message  # &\circled{3}&
+      puts "Posted message #{message} to queue #{queue_out.url}"
+    rescue
+      puts "#{$!.class}: #{$!.message}"
+    end
+  end
+end
+
+\end{lstlisting}
+
+\item Here’s how to use this tool:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ ruby crawler/parse_page.rb 
+&\outputcommand{Processing URL: http://s3.amazonaws.com/developing\_cloud\_application\_bucket/page\_a1690b0f6347aadb4d700c627c8fe3a8.html with original http://www.freedigitalphotos.net/images/People\_g40.html\\
+Processing image ["http://www.freedigitalphotos.net/images/cart.png", "http://www.freedigitalphotos.net/images/nav\_arrow.gif",\\ "http://www.freedigitalphotos.net/gal\_images/av-\_146.jpg", "http://www.freedigitalphotos.net/gal\_images/av-\_332.jpg"\\
+\dots}&
+\end{lstlisting}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Stage 3 - Fetching Image URLs}
+\begin{itemize}
+\item This stage takes the array of image URLs from the previous stage, and fetches each
+one. It then uses the \texttt{thumbnail\_image} function that we wrote  to scale
+the image to a smaller size, as defined by the \texttt{THUMB\_SIZE} constant
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/crawler/fetch_images.rb
+#
+
+require 'net/http'
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+require File.expand_path(File.dirname(__FILE__) + '/../s3/book.inc')
+
+# get an instance of the SQS and S3 interfaces using the default configuration
+sqs = AWS::SQS.new
+s3 = AWS::S3.new
+
+begin
+  sqs.queues.create IMAGE_QUEUE
+  queue_in = sqs.queues.named IMAGE_QUEUE
+  sqs.queues.create RENDER_QUEUE
+  queue_out = sqs.queues.named RENDER_QUEUE
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+bucket = s3.buckets.create BOOK_BUCKET
+abort "Error creating #{bucket_name} bucket" unless bucket.exists?
+
+# Receive messages from the url queue (forever loop)
+queue_in.poll do |msg|
+  s3_image_keys = []
+
+  puts " Retrieved message: Image URLs: #{JSON.parse(msg.body)['data']}"
+  JSON.parse(msg.body)['data'].each do |img_url|
+    puts "Processing image: #{img_url}"
+    img_contents  = Net::HTTP.get(URI.parse(img_url))  # &\circled{1} &
+    puts "Retrieved #{img_contents.length} bytes of image"
+    begin
+      img_out = thumbnail_image img_contents  # &\circled{2} &
+      puts 'Generated thumbnail'
+      key = "image_#{Digest::MD5.hexdigest(img_url)}.png"
+
+      if upload_object( s3, bucket, key, img_out, 'image/png' )   # &\circled{3} &
+        puts "Uploaded image to S3 as #{key}"
+        s3_image_keys << key
+      else
+        puts "Error uploading image #{img_url} to S3"
+      end
+      break if s3_image_keys.size >= 16
+    rescue
+      puts "#{$!.class}: #{$!.message}"
+    end
+
+  end
+
+  if s3_image_keys.size > 0   # &\circled{4} &
+    message = {action: 'RenderPage',
+               origin: __FILE__,
+               data: s3_image_keys,
+               history: "Posted by #{__FILE__} at #{Time.now}",
+               page_title: JSON.parse(msg.body)['title']}.to_json
+    begin
+      queue_out.send_message message
+      puts "Posted message #{message} to queue #{queue_out.url}"
+    rescue
+      puts "#{$!.class}: #{$!.message}"
+    end
+  end
+end
+\end{lstlisting}
+\item Here’s how to use this tool:
+\lstset{language=shell}
+\begin{lstlisting}
+$ ruby crawler/fetch_images.rb 
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Stage 4 - Render Images}
+\begin{itemize}
+\item The fourth and final stage takes the S3 object keys and fetches each object from S3
+before generating a thumbnail mosaic image
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+#
+# aws_app/crawler/render_image.rb
+#
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+require File.expand_path("#{File.dirname(__FILE__)}/../s3/book.inc")
+
+def new_image(width, height, format = "png", bgcolor = "transparent")
+  tmp = Tempfile.new(%W[mini_magick_ .#{format}])
+  `convert -size #{width}x#{height} xc:#{bgcolor} #{tmp.path}`
+  MiniMagick::Image.new(tmp.path, tmp)
+end
+
+# get an instance of the SQS and S3 interfaces using the default configuration
+sqs = AWS::SQS.new
+s3 = AWS::S3.new
+
+begin
+  sqs.queues.create RENDER_QUEUE
+  queue_in = sqs.queues.named RENDER_QUEUE
+rescue
+  abort "#{$!.class}: #{$!.message}"
+end
+
+bucket = s3.buckets.create BOOK_BUCKET
+abort "Error creating #{bucket_name} bucket" unless bucket.exists?
+
+# Receive messages from the render queue (forever loop)
+
+s3_image_keys = []
+queue_in.poll do |msg|
+  x_offset = 0
+  y_offset = 0
+  image_array = JSON.parse(msg.body)['data']
+  width = Integer(Math.sqrt  image_array.length)
+  output_image = new_image width*THUMB_SIZE, width*THUMB_SIZE , 'png', 'transparent'
+
+  image_array.each do |img_url|
+    puts "image_location = http://s3.amazonaws.com/#{BOOK_BUCKET}/#{img_url}"
+    tmp_image = MiniMagick::Image.open("http://s3.amazonaws.com/#{BOOK_BUCKET}/#{img_url}")
+    output_image = output_image.composite(tmp_image,'png') do |c|
+      c.gravity 'NorthWest'
+      c.geometry "+#{x_offset*THUMB_SIZE}+#{y_offset*THUMB_SIZE}"
+    end
+    if (x_offset += 1) >= width
+      x_offset, y_offset = 0 , y_offset + 1
+    end
+  end
+
+  output_image_name = "#{JSON.parse(msg.body)['page_title']}.#{Time.now}.png"
+  key = 'final_image_' + Digest::MD5.hexdigest(output_image_name) + '.png'
+  if upload_object( s3, bucket, key, output_image.to_blob, 'image/png')
+    p "Stored final image in S3 using key #{key}. URL:http://s3.amazonaws.com/#{BOOK_BUCKET}/#{key}"
+  else
+    puts "Error uploading image #{img_url} to S3"
+  end
+end
+\end{lstlisting}
+\item Here’s how to use this tool:
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby crawler/render_image.rb 
+!\outputcommand{image\_location = http://s3.amazonaws.com/developing\_cloud\_application\_bucket/image\_bfd43e28e9c24b6aa58be89ca9ddf2c1.png\\
+image\_location = http://s3.amazonaws.com/developing\_cloud\_application\_bucket/image\_f65b5f3577de03898c83e8d56df44d0a.png\\
+\dots\\
+"Stored final image in S3 using key final\_image\_d6fe8533d597552e2858a793abd937e8.png. URL:http://s3.amazonaws.com/developing\_cloud\_application\_bucket/final\_image\_d6fe8533d597552e2858a793abd937e8.png"}!
+\end{lstlisting}
+
+\item You can run all proccess together writting \texttt{fetch\_page \&; parse\_page \&; fetch\_image \&; render\_image \& } and then run \texttt{load\_crawl\_url \dots} to start filling the first queue
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Homework}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
@@ -381,7 +833,7 @@ Hello World!
 \item ???
 \end{itemize}
 \end{frame}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
 
 \section*{Acronyms}
