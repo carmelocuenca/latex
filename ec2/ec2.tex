@@ -11,9 +11,10 @@
 
 \usepackage{listings}
 \lstloadlanguages{Ruby}
+\usepackage{cancel}
 
 \usepackage{adjustbox}
-\usepackage{../common/lstcustom}
+\usepackage{lstcustom}
 
 \usepackage{amsmath}
 
@@ -42,17 +43,17 @@
 
 \graphicspath{ {./images/} }
 
-\title{Launching an Amazon EC2 Instance}
+\title{Using the EC2 API}
 %\subtitle[short subtitle]{long subtitle}
 \author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
 %\institute{Escuela Universitaria de Informática}
 %\date[04/2013]{Abril - 2013}
 \date{}
-\titlegraphic{\includegraphics[width=0.5 \textwidth]{../common/logo_ulpgc_version_horizontal_rgb.eps}}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{./images/logo_ulpgc_version_horizontal_rgb.eps}}
 
 
 
-\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{../common/logosimbolo_secundario_version_vertical}
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{./images/logosimbolo_secundario_version_vertical}
 \setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
   \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
   \usebeamertemplate{navigation symbols}\hfill
@@ -68,6 +69,8 @@
 
 \selectlanguage{british}
 
+
+
 \begin{document}
 
 
@@ -77,74 +80,113 @@
 
 
 \section*{Outline}
-\begin{frame}
+\begin{frame}[fragile, allowframebreaks]
   \frametitle{Outline}
   %\tableofcontents%[part=1,pausesections]
-  \tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
-  %\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+  %\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  \tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\newacronym{<label>}{<abbrv>}{<full>}
-%\gls{<label>}
 %\glsreset{<label>}
 %\glsresetall
 %\acrlong{<label>}
 %\acrfull{<label>}
 %\acrshort{<label>}
+%\input{../glossary}
 
-\input{../common/acronym}
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{css}{CSS}{cascading style sheets}
+\newacronym{ebs}{EBS}{Elastic Block Storage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Amazon Elastic Compute Cloud}
+\section{Using the EC2 API}
 \begin{frame}[fragile]
-\frametitle{Amazon Elastic Compute Cloud}
- http://aws.amazon.com/ec2/
-\begin{columns}
- \column{ 0.20 \textwidth}
- \href{http://aws.amazon.com/ec2/}{\includegraphics[width= 1.4 \textwidth]{aws_ec2.eps}}
-
- \column{ 0.80 \textwidth}
- \begin{itemize}
- \item \gls{ec2} is a web service that provides resizable compute capacity in the cloud. It is designed to make web-scale computing easier for developers
- \item \glspl{ec2} simple web service interface allows you to obtain and configure capacity with minimal friction
+\frametitle{Using the EC2 API}
+\begin{itemize}
+\item Key to the concept of the programmable data center is the fact that every resource
+can be manipulated by an external program. In just over 50 lines (including comments and error
+checking) the program does the following:
+\begin{enumerate}
+\item launches an EC2 instance
+\item waits for the instance to transition to the ``running'' state
+\item allocates a public IP address
+\item attaches the IP address to the EC2 instance
+\item allocates a 1GB EBS volume
+\item attaches the volume to the EC2 instance
+\end{enumerate}
 \end{itemize}
 
-    
-  
-\end{columns}
-   
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/ec2/ec2_setup.rb
+#
 
+require File.expand_path(File.dirname(__FILE__) + '/../config')
 
+# get an instance of the EC2 interface using the default configuration
+ec2 = sqs = AWS::EC2.new
 
+AVAILABILITY_ZONE = 'us-east-1d'
+begin
+  # CentOS-6-i386-20120527-EBS-04-0c28ae8a-844c-4df2-822f-8a80374b8c8a-ami-45e9832c.1 (ami-fdbdc894)
+  instance = ec2.instances.create(
+      image_id: 'ami-fdbdc894',
+      availability_zone: AVAILABILITY_ZONE,
+      security_group_ids: 'sg-570c3f3c',
+      instance_type: 't1.micro',
+      block_device_mappings: [{   device_name: "/dev/sda2",
+                                  ebs: {volume_size: 8, # 8 GB
+                                        delete_on_termination: true
+                                  }
+                              }])
+
+  begin
+    puts "Waiting for instance #{instance.id} is running in availability zone #{instance.availability_zone}"
+    sleep 1
+  end while instance.status != :running
+  puts "Launched and running instance #{instance.id} in availability zone #{instance.availability_zone}"
+
+  # Elastic IP
+  eip = ec2.elastic_ips.create
+  puts "Assigned IP Adress #{eip}"
+  eip.associate instance: instance.id
+  puts "Associated IP Address #{eip} with instance #{instance.id}"
+
+  # EBS
+  # Create an empty 1GB volume and attach it to an instance
+  volume = ec2.volumes.create(size: 1,
+                              availability_zone: AVAILABILITY_ZONE)
+  attachment = volume.attach_to(instance, '/dev/sdf')
+  begin
+  puts puts "Waiting for attachment  #{volume.id} to instance #{instance.id}"
+  sleep 1
+  end while attachment.status != :attaching
+  puts "Attached volume #{volume.id} to instance #{instance.id}"
+rescue Exception => e
+  puts e.message
+end
+\end{lstlisting}
 
 \end{frame}
+\section{Homeworks}
+\begin{frame}[fragile]
+\frametitle{Homeworks}
+\begin{itemize}
+\item Modifica el programa \texttt{aws\_app/ec2/ec2\_setup.rb} para que a la instancia creada pueda accederse vía ssh
+\item Modifica el programa \texttt{aws\_app/ec2/ec2\_setup.rb} para que libere los recursos provisionados
+\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{The Amazon \acrfull{ec2} Pricing Model}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Instance Use}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Data Transfer}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{AMI Storage}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{IP Address Reservations}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Elastic Block Storage}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{Launch an Amazon EC2 Instance}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Creating and Preparing an SSH Key}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Lauching an Instance}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Enabling SSH Access}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Connecting to the Instance}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Assigning an IP Address}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\end{frame}
 \end{document}

@@ -135,9 +135,10 @@ As user \texttt{invitado}, carry out the steps for installing Ruby 2.0.0
 
 \lstset{language=shell}
 \begin{lstlisting}[numbers=none, escapechar=!]
-$ \curl -L https://get.rvm.io | bash
+$ \curl -L https://get.rvm.io | bash -s stable --auto-dotfiles
 !\outputcommand{A lot of stuff}!
 $ source /home/invitado/.rvm/scripts/rvm
+$ rvm install 2.0.0
 $ rvm docs generate
 \end{lstlisting}
 
@@ -962,7 +963,7 @@ end
 
 if a==10
   puts 'a is 10'
-Elsi a==20
+elsif a==20
   puts 'a is 20'
 end
 \end{lstlisting}
@@ -1066,9 +1067,7 @@ a.each do |i|
 end
 
 b = a.map{|i| i*i}
-b.each do |i|
-  puts i
-end
+b.each{ |i| puts i}
 \end{lstlisting}
 
 \lstset{language=shell}
