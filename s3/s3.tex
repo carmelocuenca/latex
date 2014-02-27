@@ -360,6 +360,18 @@ end
 AWS.config(config)
 \end{lstlisting}
 
+\item \texttt{aws\_app/s3/s3/book.inc.rb}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=$]
+#
+# aws_app/s3/book.inc.rb
+#
+# This file is required by some *.rb files
+# It defines default constant value
+
+BOOK_BUCKET = :developing_cloud_application_bucket # $\circled{1}$
+\end{lstlisting}
+
 \item \texttt{aws\_app/s3/create\_bucket.rb}
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=$]
