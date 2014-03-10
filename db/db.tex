@@ -1,0 +1,316 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[british,spanish]{babel}
+%usepackage[utf8]{inputenx}
+
+\usepackage{hyperref}
+%\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{multirow}
+
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstloadlanguages{Ruby}
+\usepackage{cancel}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{amsmath}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+
+\newcommand{\comment}[2]{#2}
+
+\newcommand{\commandinline}[1]{\lstinline[basicstyle=\small\lstfontfamily]{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+\graphicspath{ {./images/} }
+
+\title{Amazon SimpleDB: A Cloud Database}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{./images/logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\selectlanguage{british}
+
+
+
+\begin{document}
+
+%\includegraphics[width= 1.0 \textwidth]{logos3.eps}
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  \tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  %\tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+%\input{../glossary}
+
+\newacronym{acl}{ACL}{Access Control List}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{aws}{AWS}{Amazon Web Services}
+\newacronym{cli}{CLI}{Command Line Interface}
+\newacronym{css}{CSS}{cascading style sheets}
+\newacronym{ebs}{EBS}{Elastic Block StoAWS Identity an Access Managementrage}
+\newacronym{ec2}{EC2}{Amazon Elastic Compute Cloud}
+\newacronym{elb}{ELB}{Elastic Load Balancing}
+\newacronym{iam}{IAM}{Identity Access Management}
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+\newacronym{s3}{S3}{Simple Storage Service}
+\newacronym{sqs}{SQS}{Amazon Simple Queue Service}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Amazon SimpleDB}
+\begin{frame}[fragile]
+\frametitle{Amazon SimpleDB}
+\begin{itemize}
+ \item Amazon SimpleDB is a cloud-based database
+ \item SimpleDB excels at storing semi-structured data where the items (rows) are similar but not necessarily identical to each other
+ \item All data stored in Amazon SimpleDB is automatically indexed
+ \item The Amazon SimpleDB model lacks support for joins across domains (roughly
+equivalent to relational tables); instead, you can store data in non-normalized form
+for more efficient access
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Amazon SimpleDB Concepts}
+\begin{itemize}
+ \item An Amazon SimpleDB \emph{domain} is roughly analogous to a table in a relational database.  Each domain can store up to \texttt{10GB} of data
+ \item SimpleDB excels at storing semi-structured data where the items (rows) are similar but not necessarily identical to each other
+ \item Each item in a SimpleDB domain has a name (unique to the domain) and up to \texttt{256} attributes (name-value pairs).
+       Item names, attribute names, and attribute values can each be up to \texttt{1024} bytes long
+ \item Item attributes can be multivalued 
+ \item All attribute values are treated as strings (\alert{numerical values?})
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{\texttt{Select}}
+\begin{tabular}{|l|l|l|l|l|l|l|} \hline
+item\_name & first\_name & last\_name & age & sex & middle & state \\ \hline
+Rec1 & Tom & Basic & 12 & M & & \\ \hline
+Rec2 & Nancy & Hacker & 15 & F & & MD \\ \hline 
+Rec3 & Joan & Hughes & 44 & F & Fraft & NY, NJ\\ \hline 
+\end{tabular} 
+
+\begin{itemize}
+ \item \texttt{select * from People where FirstName="Tom"} (Rec1)
+ \item \texttt{select FirstName,Middle,LastName from People where LastName >= "H"} (Rec2 and Rec3)
+ \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Amazon SimpleDB Pricing}
+\begin{frame}[fragile]
+\frametitle{Amazon SimpleDB Pricing}
+
+\begin{itemize}
+ \item Data transfer. Data transferred into SimpleDB is charged at a rate of \$0.10 per gigabyte
+ \item Data storage. You pay \$0. 25 ( a quarter) per gigabyte per month to store data in Simple DB
+ \item Machine utilization. You pay \$0.14 per hour for the machine time used to process each SimpleDB
+request
+ \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Amazon SimpleDB Programming Model}
+\begin{frame}[fragile]
+\frametitle{Amazon SimpleDB Programming Model}
+\begin{itemize}
+ \item The Amazon SimpleDB programming model consists of just nine calls:
+ \begin{itemize}
+ \item At the domain level: \texttt{CreateDomain}, \texttt{DeleteDomain}, \texttt{ListDomains}, \texttt{DomainMetadata}
+ \item At the item level
+ \begin{itemize}
+ \item \texttt{PutAttributes} creates new items and adds or replaces (your choice) additional attributes to existing items
+ \item \texttt{BatchPutAttributes} is an extended version of this call that handles multiple items at once
+ \item \texttt{DeleteAttributes} removes attributes from an item
+ \item \texttt{GetAttributes} retrieve specified attributes
+ \item \texttt{Select} issues a SQL query
+ \end{itemize}
+\end{itemize}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Create a Domain}
+\begin{itemize}
+\item Here’ s a script that creates all the SimpleDB domains needed for the examples
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/book.inc.rb
+#
+# This file is required by some *.rb files
+# It defines default constant value
+
+BOOK_FILE_DOMAIN = 'files'
+BOOK_FEED_DOMAIN = 'feeds'
+BOOK_FEED_ITEM_DOMAIN = 'feed_items'
+\end{lstlisting}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/create_domain.rb
+#
+# Usage: ruby simpledb/create_domain.rb
+#
+
+require File.expand_path("#{File.dirname(__FILE__)}/../config")
+require File.expand_path("#{File.dirname(__FILE__)}/book.inc")
+
+#get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new(region: 'us-east-1')
+
+[BOOK_FILE_DOMAIN, BOOK_FEED_DOMAIN, BOOK_FEED_ITEM_DOMAIN].each do |domain_name|
+  begin
+    domain = sdb.domains.create(domain_name)
+      puts "Domain #{domain.name} created"
+  rescue Exception => e
+    puts e.message
+  end
+end
+\end{lstlisting}
+
+\item Modify the above script to accept new domain names on the command line (Exercise)
+\item Install SDBTool plugin in Firefox from http://code.google.com/p/sdbtool/ and use it (Exercise)
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{List Domains}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/list_domains.rb
+#
+# Usage: ruby simpledb/lists_domains.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new region: 'us-east-1'
+
+sdb.domains.each do |domain|
+  puts domain.name
+end
+\end{lstlisting}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Storing Data}
+\begin{itemize}
+\item The next step is to store some data in a domain. This is done using the
+\texttt{put\_attributes} method. This method can be used to create new items or to add
+additional attributes to existing items
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/insert_items.rb
+#
+# Usage: ruby simpledb/insert_items.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+Dir.entries('.').select{ |file| file.match(/^[a-zA-Z0-9_-]*\.rb$/)}.each do |filename|
+  File.open filename do |f|
+    data = f.read
+    size = f.size
+    md5 = Digest::MD5.hexdigest(data)
+
+    item = sdb.domains[BOOK_FILE_DOMAIN].items[filename]
+    item.attributes.put(
+      add: { name: filename }, # Append values to this attribute
+      replace: { md5: md5, size: "%08d" % size}  # Set all values for this attribute, replacing current values
+    )
+  end
+end
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Storing Multiple Items Efficiently}
+\begin{itemize}
+\item The next step is to store some data in a domain. This is done using the
+\texttt{put\_attributes} method. This method can be used to create new items or to add
+additional attributes to existing items
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+

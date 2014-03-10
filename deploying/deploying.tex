@@ -120,32 +120,44 @@ and to return to exercises and ideas that you don’t understand, and understand
 \end{itemize}
 
 \end{frame}
-
+\section{Roadmap}
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Web Server in Production Mode}
-Amazon es el mayor proveedor de servicios para la ``nube'' en el mundo muy por delante de Google o Microsoft.
-\acrfull{ec2} es uno de estos servicios y proporciona infraestructuras tecnológicas de computadores y posibilita
-desplegar un computador a medida en la ``nube'' (una instancia de una imagen en lenguaje de Amazon)
+\frametitle{Roadmap}
+Amazon es el mayor proveedor de servicios cloud en el mundo, muy por delante de Google o Microsoft.\\
+\acrfull{ec2} es uno de estos servicios. Proporciona infraestructuras tecnológicas de computación y posibilita
+desplegar un computador a medida en la nube (una instancia de una imagen, en lenguaje de Amazon).\\
 
-\begin{itemize}
-\item Nosotros desplegaremos una máquina ``micro'' con un CentOS 6.
-Dado que esta máquina constituirá infraestructura para un entorno de producción, la imagen sólo contendrá inicialmente los paquetes mínimos (no Gnome, no KDE, no \dots).
+La tarea que realizaremos en este bloque es la siguiente:
+\begin{enumerate}
+\item Desplegaremos una máquina ``micro'' con un SO CentOS 6, y le asignaremos una ``Elastic IP'' (servicio de Amazon).
+Esta máquina constituirá la infraestructura para un entorno de producción, y la imagen inicialmente sólo contendrá 
+los paquetes mínimos (no Gnome, no KDE, no \dots).
 
-\item Añadiremos los paquetes necesarios para convertirla en un servidor LAMP (Linux, Apache, MySQL y PHP) y configuraremos los diferentes cortafuegos: ``Security Groups'' de Amazon y SElinux de CentOS.
-Testearemos el funcionamiento del servidor LAMP y aprovecharemos para introducir el concepto de ``Elastic IP'' (otro servicio de Amazon).
+\item Añadiremos los paquetes necesarios para convertirla en un servidor LAMP (Linux, Apache, MySQL y PHP), configuraremos 
+los diferentes cortafuegos: Security Group de Amazon, firewall de Linux y SElinux de CentOS, y
+testearemos el funcionamiento del servidor LAMP. 
 
-\item Dado que nuestra elección para el almacenamiento de datos no es MySQL, sino PostgreSQL (entre otras, por  razones de escalabilidad), convertiremos nuestra máquina en un servidor de PostgreSQL.
+\item Dado que nuestra elección para el almacenamiento de datos no es MySQL, sino PostgreSQL (entre otras, por  razones de 
+escalabilidad), convertiremos nuestra máquina en un servidor de PostgreSQL.
 
-\item A continuación, portaremos una aplicación ya desarrollada en \acrfull{ror} que simula el código de cualquier aplicación. El éxito del despliege depende de configurar la máquina y convertirla en un servidor de aplicaciones \acrshort{ror}.
-La metodología consiste en añadir primeramente un usuario para cada aplicación, limitando así los accessos a los recursos de la máquina (queremos tener múltiples aplicaciones en el mismo servidor).
+\item Desplegaremos una aplicación ejemplo ya desarrollada en \acrfull{ror} (esta aplicación podría ser cualquiera). 
+El éxito del despliege depende de configurar la máquina y convertirla en un servidor de aplicaciones \acrshort{ror}.
+Añadimos primeramente un usuario para la aplicación, limitando así el accesso a los recursos de la máquina (asumiremos que
+podríamos llegar a tener múltiples aplicaciones en el mismo servidor).
 
-\item Mediante \acrfull{rvm} instalaremos Ruby y \acrshort{ror}. Con ``Git''  colocaremos el código en la máquina virtual. Comprobaremos que funciona en los entornos de test y desarrollo.
+\item Mediante \acrfull{rvm} instalaremos Ruby y \acrshort{ror}. Con ``Git'' colocaremos el código de la aplicación en 
+la máquina virtual. La instalaremos y comprobaremos que funciona en los entornos de desarrollo y test.
 
-\item Ya sólo nos faltará desplegar  un servidor porfesional de \acrshort{ror}, nuestra elección para ilustrar ha sido el más complejo de configurar ``unicorn''. Instalaremos Unicorn, comprobaremos que funciona en el entorno de producción y escribiremos un script para lanzarlo como un servicio.
+\item Desplegaremos un servidor profesional de aplicaciones \acrshort{ror}. Nuestra elección para ilustrar el ejemplo
+ha sido ``Unicorn'', el más complejo de configurar. Instalaremos Unicorn, comprobaremos que funciona en el entorno de 
+producción y escribiremos un script para lanzarlo como un servicio.
 
-\item Finalmente, el alumno desarrollará un trabajo similar de desplegar cualquier otra aplicación \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mongol) o el despliegue de un gestor de contenidos.
+\item Finalmente, añadiremos un host virtual.
 
-\end{itemize}
+\item Como aplicación de los contenidos trabajados, el alumno desarrollará un trabajo similar consistente en desplegar una aplicación 
+ejemplo \acrshort{ror} con cualquier otro servidor profesional (Passenger, Thin, Mongrel), y el despliegue de un gestor de contenidos.
+
+\end{enumerate}
 \end{frame}
 
 \section{Launching an Amazon EC2 Instance}
@@ -153,15 +165,43 @@ La metodología consiste en añadir primeramente un usuario para cada aplicació
 \frametitle{Launching an Amazon EC2 Instance}
 
 \begin{itemize}
-\item Prepare a Key Pair
-\item Create or edit a ``Security Group'' \includegraphics[width=1.0 \textwidth]{securitygroup.eps}
-\item Launch a minimal \texttt{CentOS 6 (i386) - with Updates} in \url{https://aws.amazon.com/marketplace/pp/B00A6KZBC6/ref=sp_mpg_product_title?ie=UTF8&sr=0-2}
-\item Then, we can login in the instance
+
+\item Sign in AWS (in the IAM created in the previous block), as the deployer user
+\item Before launching an instance we are going to prepare a ``Key Pair'' and a ``Security Group''. Both will be used in the process
+of launching the instance
+\item Go to the AWS Console $\Rightarrow$ EC2 and select ``US East (N. Virginia)'' zone (up right corner of the page)
+\item Go to Key Pairs and prepare a Key Pair
+\item Download the key and move it to the \texttt{.ssh} directory in your virtual machine (invitado@perdidita)
+\item Change the permissions of the key file
+\lstset{language=shell, numbers=none}
+\begin{lstlisting}[escapechar=!]
+$ chmod 0600 your_key_file.pem 
+\end{lstlisting}
+\item Create a ``Security Group'' with these 5 rules:
+ \includegraphics[width=1.0 \textwidth]{securitygroup.eps}
+\textbf{TIP}: Don`t forget to click ``Apply rule changes''
+\item Go to Instances, and click ``Launch'' an instance.
+\item Choose AWS Marketplace to choose an AMI for the instance. Click in the listing by ``Operating Systems''\\
+ Problems? Guess what is happening?
+\item Launch a minimal \texttt{CentOS 6 (i386) - with Updates} \\
+\comment{in \url{https://aws.amazon.com/marketplace/pp/B00A6KZBC6/ref=sp_mpg_product_title?ie=UTF8&sr=0-2}}
+\textbf{CAREFUL}:Enable Monitoring CloudWatch and Termination Protection\\
+\textbf{CAREFUL}: In the EBS configuration enable ``Delete on termination''
+
+\item Once the instance is launched, go to Instances, select it and explore its characteristics in the lower part of the page
+\item As the public IP address assigned to the instance changes every time the instance is started, let's create an ``Elastic IP''
+and assign it to our instance. Now, the IP address will not change, but \textbf{we pay for that service}.
+
+\item Having a known IP address allows us to access our instance easily. Edit the file /etc/hosts as a superuser and add the line:
+\begin{lstlisting}[escapechar=!]
+your_Elastic_IP_address   depot_app_server.example.com    depot_app_server
+\end{lstlisting}
+\item Now go back to AWS to check if the instance is running (this can take a couple of minutes). If so, we can login in from 
+invitado@perdidita
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-$ chmod 0600 your_key_file.pem 
-$ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
+$ ssh -i .ssh/your_key_file.pem root@depot_app_server
 \end{lstlisting}
 
 \end{itemize}
@@ -181,19 +221,25 @@ $ ssh -i your_key_file.pem root@ec2-nnn-nnn-nn-nnn.compute-1.amazonaws.com
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Installing a LAMP Web Server}
 \begin{itemize}
-\item To ensure that all of your software packages are up to date, perform a quick software update on your instance
-
+\item Before starting the installation we set the language to US english
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
-# echo "export LANG=en_EN.UTF8" >> ~/.bashrc
+# echo "export LANG=en_US.UTF8" >> ~/.bashrc
 # source ~/.bashrc
+\end{lstlisting}
+
+\item To ensure that all of your software packages are up to date, perform a quick software update on your instance
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
 # yum update -y
 \end{lstlisting}
+
 \item Now that your instance is updated, you can install the Apache web server, MySQL, and PHP software packages. Use the \texttt{yum groupinstall} command to install multiple software packages and all related dependencies at the same time
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 # yum groupinstall -y "Web Server" "MySQL Database" "PHP Support"
 \end{lstlisting}
+
 \item Install the php-mysql package
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
@@ -239,7 +285,7 @@ SELINUX=disabled !\circled{1}!
 \end{lstlisting}
 
 \item We use \texttt{system-config-firewall-tui} command to configure the firewall on your instance to allow these connections. 
-Since \texttt{newt-python} is required for \texttt{system-config-firewall-tui to work}, it should be added to the AMI
+Since \texttt{newt-python} is required for \texttt{system-config-firewall-tui to work}, it should be added to the instance
 
 (\href{http://bugs.centos.org/view.php?id=6877}{http://bugs.centos.org/view.php?id=6877})
 \lstset{language=shell}
@@ -248,23 +294,25 @@ Since \texttt{newt-python} is required for \texttt{system-config-firewall-tui to
 # system-config-firewall-tui
 \end{lstlisting}
 
-\item We should open \texttt{http} port 80, \texttt{https} port 447,  \texttt{ssh} port 22 and \texttt{\alert{3000 and 5000}} ports for ``tcp'' protocol
+\item We will open: \texttt{http} port 80, \texttt{https} port 447,  \texttt{ssh} port 22 
+and \texttt{\alert{3000 and 5000}} ports for ``tcp'' protocol. The last two with customized added rules
  
 \includegraphics[width=0.5 \textwidth]{system-config-firewall-tui.eps}
 
-\item To test your LAMP web server in a web browser,  create simple html and PHP files in the \texttt{/var/www/html} directory that will be available from the Internet with
+\item To test your LAMP web server in a web browser, create simple html and PHP files in the \texttt{/var/www/html}
+directory that will be available from the Internet
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=&]
-# echo '<p>Hello World!<p>' > /var/www/html/index.html
+# echo '<p>Hello World!</p>' > /var/www/html/index.html
 # echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
 \end{lstlisting}
 
 
-\item Curl the URL of the files you just created. This URL is the public DNS address of your instance followed by a forward slash and the file name. For example
+\item Access the files using the web browser from outside the instance or by using curl with the URL of the files.
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ curl http://my.public.dns.amazonaws.com/
-$ curl http://my.public.dns.amazonaws.com/phpinfo.php
+$ curl http://depot_app_server
+$ curl http://depot_app_server/phpinfo.php
 \end{lstlisting}
 
 
@@ -481,11 +529,12 @@ $ yum grouplist Postgre*
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-# su -1!~!postgres
+# su -!~!postgres
 $ createuser -d -R -S -P depot_app
 !\outputcommand{Enter password for new role:}!
 !\outputcommand{Enter it again:}!
 \end{lstlisting}
+\textbf{IMPORTANT}: Password must have at least 8 characters. Our advice: 12345678 (if not, don`t forget this password!!)
 
 \item Edit the PostgreSQL configuration file \texttt{/var/lib/pgsql/9.3/data/pg\_hba.conf}
 
@@ -502,7 +551,7 @@ host    all all ::1/128 md5 !\circled{4}!
 !\vdots!
 \end{lstlisting}
 
-\item Restart the PostgreSQL daemon
+\item Exit postgres user and restart the PostgreSQL daemon
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
@@ -524,12 +573,10 @@ host    all all ::1/128 md5 !\circled{4}!
 \begin{lstlisting}[escapechar=!]
 # adduser depot_app
 \end{lstlisting}
-
-
 \end{itemize}
-
-
 \end{frame}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Setting Up Rails Environment for \texttt{depot\_app} User}
 \begin{frame}[fragile, allowframebreaks]
@@ -547,12 +594,12 @@ $ echo '<p>Hello World!</p>' >  public_html/index.html
 \end{lstlisting}
 
 \begin{block}{Warning!}
-  localhost is ``perdidita''
+  Remember that localhost is ``perdidita''
 \end{block}
-\item Then we run \texttt{curl} in our \alert{localhost} in order to test 
+\item Then we test by running \texttt{curl} in our \alert{localhost} or accessing via web browser
 
 \begin{lstlisting}[escapechar=&]
-$ curl http://my.public.dns.amazonaws.com/~depot_app
+$ curl http://depot_app_server/~depot_app
 \end{lstlisting}
 
 \item Carry out the steps for installing Ruby 2.0.0 and \acrshort{ror} 4.x via \acrshort{rvm}
@@ -598,21 +645,20 @@ $ bundle install
 !\outputcommand{A lot of stuff}!
 \end{lstlisting}
 
-\item Then setup the database and run the server in development mode
+\item Then setup the database and run the server in development mode (this is the default)
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
+$ rake db:create
 $ rake db:migrate
 $ rake db:seed
 $ rails server
 !\outputcommand{A lot of stuff}!
 \end{lstlisting}
 
-\item Curl the URL of the files you just created.
-This URL is the public DNS address of your instance followed by the port number
-
+\item Curl the application URL (or access via browser).
 \begin{lstlisting}[escapechar=!]
-$ curl http://my.public.dns.amazonaws.com:3000
+$ curl http://depot_app_server:3000
 \end{lstlisting}
 
 \includegraphics[width=0.75 \textwidth]{tienda.eps}
@@ -623,8 +669,10 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Application in Development and Production Environments}
 \begin{itemize}
-\item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQL}
 
+
+\comment{
+\item Edit \texttt{config/database.yml} file (configuration database file) in order to run the application with \texttt{PostgreSQL}
 \lstset{language=Ruby, style=eclipse, numbers=left}
 \begin{lstlisting}[escapechar=!]
 !\vdots!
@@ -634,11 +682,13 @@ production:
   database: depot_app_production
   pool: 5
   username: depot_app
-  password: 123456 # your favorite password
+  password: 12345678 # This is the password we suggested
 !\vdots!
 \end{lstlisting}
+}
 
-\item Create \texttt{depot\_app\_production} database, migrate tables and  seed the data
+
+\item Create the database, migrate tables and seed the data, \textbf{specifying the production environment}
 
 \lstset{language=shell, style=eclipse}
 \begin{lstlisting}[numbers=none, escapechar=!]
@@ -647,19 +697,20 @@ $ rake db:migrate RAILS_ENV=production
 $ rake db:seed RAILS_ENV=production
 \end{lstlisting}
 
+\item Start the rails server in production environment
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ rails server --environment production
 \end{lstlisting}
 
-\item Curl the URL of the files you just created
+\item Curl the application URL (or access via web browser)
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ curl http://my.public.dns.amazonaws.com:3000
+$ curl http://depot_app_server:3000
 \end{lstlisting}
 
-Problems? Kill Webrick server and export the ``assets''. 
+Problems? Kill rails server and export the ``assets''. 
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
@@ -667,10 +718,10 @@ $ rake assets:precompile RAILS_ENV=production
 $ rails server --environment production
 \end{lstlisting}
 
-\item Curl the URL of the files you just created. It works!
+\item Curl the application URL (or access via web browser). It works!
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ curl http://my.public.dns.amazonaws.com:3000
+$ curl http://depot_app_server:3000
 \end{lstlisting}
 \end{itemize}
 
@@ -682,9 +733,9 @@ $ curl http://my.public.dns.amazonaws.com:3000
 
 \begin{tabular}{|c|l|} \hline
  & Webrick \\ \hline
- & Mongrel in \href{https://mongrel.rubyforge.org}{https://mongrel.rubyforge.org}\\ \hline
-\includegraphics[width=0.15 \textwidth]{unicorn.eps} & Unicorn in \href{https://github.com/depot/517-unicorn}{https://github.com/depot/517-unicorn} \\ \hline
-\includegraphics[width=0.15 \textwidth]{passenger.eps} & Passenger in \href{https://www.phusionpassenger.com/}{https://www.phusionpassenger.com/} \\ \hline
+ & Mongrel in \href{https://mongrel.rubyforge.org}{https://mongrel.rubyforge.org}\\ \hline & \\
+\includegraphics[width=0.15 \textwidth]{unicorn.eps} & Unicorn in \href{https://github.com/depot/517-unicorn}{https://github.com/depot/517-unicorn} \\ \hline & \\
+\includegraphics[width=0.15 \textwidth]{passenger.eps} & Passenger in \href{https://www.phusionpassenger.com/}{https://www.phusionpassenger.com/} \\ \hline & \\
 \includegraphics[width=0.15\textwidth]{thin.eps}  & Thin in \href{https://code.macournoyer.com/thin/}{https://code.macournoyer.com/thin/} \\ \hline
 \end{tabular}
 
@@ -704,15 +755,6 @@ $ cd ~/public_html/depot_app
 $ echo "gem 'unicorn', group:  :production" >> Gemfile
 $ bundle install
 !\outputcommand{A lot of stuff...}!
-\end{lstlisting}
-
-\item To be able to start Unicorn within \acrshort{rvm} environment from an \texttt{init.d} script, we now need to generate a corresponding wrapper
-
-\lstset{language=shell, escapechar=!}
-\begin{lstlisting}[escapechar=!]
-$ rvm current
-$ rvm wrapper ruby-2.0.0-p353@railstutorial_rails_4_0 bootup unicorn
-!\outputcommand{Regenerating 2.0.0 wrappers}!
 \end{lstlisting}
 
 \item Download \href{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}{https://github.com/defunkt/unicorn/blob/master/examples/unicorn.conf.rb}
@@ -769,13 +811,13 @@ $ unicorn -E production -p 3000
 \end{lstlisting}
 
 \begin{block}{Warning!}
-  localhost is your ``perdidita''
+  Remember that localhost is ``perdidita''
 \end{block}
 
 \item Then run \texttt{curl} in your \alert{localhost} in order to test it
 
 \begin{lstlisting}[escapechar=&]
-$ curl http://my.public.dns.amazonaws.com:3000
+$ curl http://depot_app_sever:3000
 \end{lstlisting}
 
 \end{itemize}
@@ -790,7 +832,18 @@ $ curl http://my.public.dns.amazonaws.com:3000
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Writing an Unicorn Init Script}
 \begin{itemize}
-\item Create and start the init script \texttt{/etc/init.d/unicorn\_depot\_app} with port number \texttt{\alert{5000}}
+
+\item To be able to start Unicorn within an \acrshort{rvm} environment from an \texttt{init.d} script, we first need to generate a wrapper
+
+\lstset{language=shell, escapechar=!}
+\begin{lstlisting}[escapechar=!]
+$ rvm current
+$ rvm wrapper ruby-2.0.0-p353@railstutorial_rails_4_0 bootup unicorn
+!\outputcommand{Regenerating 2.0.0 wrappers}!
+\end{lstlisting}
+\item Once created, the wrapper must be in \texttt{/home/depot\_app/.rvm/bin/bootup\_unicorn}
+
+\item As the superuser, create the init script \texttt{/etc/init.d/unicorn\_depot\_app} with port number \texttt{\alert{5000}}
 \lstset{language=shell, numbers=left}
 \begin{lstlisting}[escapechar=!]
 #/bin/bash
@@ -835,6 +888,7 @@ case "$1" in
 esac
 \end{lstlisting}
 
+\item Now we can start the init script
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 # chmod +x /etc/init.d/unicorn_depot_app
@@ -844,13 +898,13 @@ esac
 \end{lstlisting}
 
 \begin{block}{Warning!}
-  localhost is ``perdidita''
+  Remember that localhost is ``perdidita''
 \end{block}
 
-\item Then run \texttt{curl} in your \alert{localhost} in order to test it
+\item Use \texttt{curl} in your \alert{localhost} to test it (or access via web browser)
 
 \begin{lstlisting}[escapechar=&]
-$ curl http://my.public.dns.amazonaws.com:5000
+$ curl http://depot_app_server:5000
 \end{lstlisting}
 
 
@@ -865,7 +919,7 @@ $ curl http://my.public.dns.amazonaws.com:5000
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Adding a Virtual Host}
 \begin{itemize}
- \item  Add a Virtual Host in Apache configuration file \texttt{/etc/httpd/conf/httpd.conf}
+ \item  As the superuser, add a Virtual Host in the Apache configuration file \texttt{/etc/httpd/conf/httpd.conf}
 
 \lstset{language=shell, escapechar=&, numbers=left}
 \begin{lstlisting}
@@ -875,11 +929,11 @@ NameVirtualHost *:80
 &\vdots&
 &\circled{2}&
 <VirtualHost *:80>
-  ServerAdmin webmaster@blog_app.com
-  DocumentRoot /home/deployer/blog_app
-  ServerName blog_app.com
-  ErrorLog logs/blog_app.example.com-error_log
-  CustomLog logs/blog_app.example.com-access_log common
+  ServerAdmin webmaster@depot_app.example.com
+  DocumentRoot /home/depot_app/public_html/depot_app
+  ServerName depot_app.example.com
+  ErrorLog logs/depot_app.example.com-error_log
+  CustomLog logs/depot_app.example.com-access_log common
 
   RewriteEngine On
 
@@ -889,23 +943,27 @@ NameVirtualHost *:80
 </VirtualHost>
 \end{lstlisting}
 
+\comment{
 \item Add to the file \texttt{/etc/hosts}
 \lstset{language=shell, escapechar=&}
 \begin{lstlisting}
 # echo "my.public.dns.amazonaws.com depot_app.com >> /etc/hosts" 
 \end{lstlisting}
+}
 
-\item Restart Apache daemon
+
+\item Restart the Apache and Unicorn daemons
 
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 # /etc/init.d/httpd restart
+# /etc/init.d/unicorn_depot_app restart
 \end{lstlisting}
 
-\item Curl the URL just created
+\item Curl the URL of your application (or access via web browser)
 
 \begin{lstlisting}[escapechar=!]
-$ curl http://depot_app.com
+$ curl http://depot_app.example.com
 \end{lstlisting} 
 
 \end{itemize}
@@ -916,11 +974,15 @@ $ curl http://depot_app.com
 \section{Homework}
 \begin{frame}
   \frametitle{Homework}
-  \begin{itemize}
-    \item Deployment a Rails Application with Mongrel, Passenger or Thin
-    \item Start Up PhpPgAdmin tool
-    \item Deploy your favorite Content Management System (Joomla!, Drupal \dots) in Amazon
-  \end{itemize}
+  \begin{enumerate}
+    \item Deploy an example Rails Application with Mongrel, Passenger or Thin in Amazon EC2
+    \item Deploy your favorite Content Management System (Joomla!, Drupal \dots) in Amazon EC2
+    \item (OPTIONAL) We have already installed the \textbf{PhpPgAdmin tool} during the process of installing PostgreSQL, but we haven`t configured it.
+     Do the start up of this tool and put it to work.
+  \end{enumerate}
+
+\textbf{Fecha de entrega}: \textbf{??}\\
+You have to upload a report of the first two tasks including: the process you followed, problems, solutions, AND an address we can access to check the work.
 \end{frame}
 
 \end{document}

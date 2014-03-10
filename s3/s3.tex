@@ -137,13 +137,16 @@ it in \acrshort{s3}, if you’d like)
 \begin{frame}[fragile]
 \frametitle{\acrshort{s3} Object Identification}
 \begin{itemize}
-\item Every \acrshort{s3} object has a unique URL formed by concatenating these components:
+\item Every \acrshort{s3} object has a URL formed by concatenating these components:
 \begin{enumerate}
 \item protocol (\texttt{http://} or \texttt{https://})
 \item bucket name ending with ``.''
 \item S3 endpoint (\texttt{s3.amazonaws.com})
 \item object key starting with ``/''
 \end{enumerate}
+Example: https://examplexperto.s3.amazonaws.com/nature1.jpeg
+\item The link that AWS provides you to access an object is slightly different: \\
+      Example: https://s3.amazonaws.com/examplexperto/nature1.jpeg
 \end{itemize}
 
 \end{frame}
@@ -229,7 +232,7 @@ to avoid writing an infinite loop which costs you money with every iteration
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Setup and Running AWS API}
 \begin{itemize}
-  \item \url{http://aws.amazon.com/documentation/sdkforruby/}
+  \item You can access the AWS SDK for Ruby at \url{http://aws.amazon.com/documentation/sdkforruby/}
   \item  Install the AWS Ruby gem
 
 \lstset{language=shell}
@@ -237,12 +240,9 @@ to avoid writing an infinite loop which costs you money with every iteration
 $  gem install aws-sdk
 \end{lstlisting}
 
-  \item Run the Samples
+  \item Get some samples and run them
   \begin{itemize}
- 
-
-
-    \item Now that you’ve installed the gem, you can run the samples, which you can find in our GitHub repository:
+    \item Now that you’ve installed the gem, you can get some samples that you can find in the AWS GitHub repository:
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
@@ -250,14 +250,15 @@ $  gem install aws-sdk
   $ cd aws-sdk-ruby/samples/
 \end{lstlisting}
 
-  \item You need to provide your \acrshort{aws} security credentials and choose a default region
+  \item You need to provide your \acrshort{aws} security credentials and choose a default region. There are several options 
+   to provide your credentials:
     \begin{itemize}
     
-      \item Hardcode ?
+      \item Hardcoded -- Not a good option!
 \begin{lstlisting}[escapechar=!]
      AWS.config(access_key_id: '...', secret_access_key: '...', region: 'us-west-2')
 \end{lstlisting}
-      \item Or you can also specify these values via `ENV`:
+      \item You can specify them via `ENV`:
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
   $ export AWS_ACCESS_KEY_ID='...'
@@ -266,7 +267,7 @@ $  gem install aws-sdk
 \end{lstlisting}
 
 
-      \item Or you can reate a file named \texttt{config.yml} in the samples directory as follows:
+      \item Or you can create a file named \texttt{config.yml} in the samples directory as follows:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
       # Fill in your AWS Access Key ID and Secret Access Key
@@ -274,6 +275,7 @@ $  gem install aws-sdk
       access_key_id: REPLACE_WITH_ACCESS_KEY_ID
       secret_access_key: REPLACE_WITH_SECRET_ACCESS_KEY
 \end{lstlisting}
+    (We`ll be using this option)
     \end{itemize}
   \item The subdirectories of the samples directory contain several code samples that you can run
   \end{itemize}
@@ -288,7 +290,7 @@ $  gem install aws-sdk
 \frametitle{Creating a S3 bucket}
 \begin{itemize}
 
-\item Set up aws project directory
+\item Set up your aws project directory
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 $ mkdir ~/ruby_projects
@@ -298,7 +300,7 @@ $ echo "aws_app" > ~/ruby_projects/aws_app/.ruby-gemset
 $ cd ~/ruby_projects/aws_app
 \end{lstlisting}
 
-\item \texttt{aws\_app/config.yml}
+\item We create the credentials file: \texttt{aws\_app/config.yml}
 \lstset{language=shell, escapechar=!}
 \begin{lstlisting}[escapechar=!]
 #
@@ -311,7 +313,7 @@ access_key_id: YOUR_ACCESS_KEY_ID
 secret_access_key: YOUR_SECRET_ACCESS_KEY
 \end{lstlisting}
 
-\item \texttt{aws\_app/config.rb}
+\item We also create a file to load the config.yml file and configurate AWS: \texttt{aws\_app/config.rb}
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=$]
 # Copyright 2011-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -360,7 +362,7 @@ end
 AWS.config(config)
 \end{lstlisting}
 
-\item \texttt{aws\_app/s3/s3/book.inc.rb}
+\item We create an auxiliar file to define some constant values (and more): \texttt{aws\_app/s3/book.inc.rb}
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=$]
 #
@@ -372,7 +374,7 @@ AWS.config(config)
 BOOK_BUCKET = :developing_cloud_application_bucket # $\circled{1}$
 \end{lstlisting}
 
-\item \texttt{aws\_app/s3/create\_bucket.rb}
+\item Our first utility will be to create a bucket in AWS S3: \texttt{aws\_app/s3/create\_bucket.rb}
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=$]
 #
@@ -419,7 +421,7 @@ end
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Listing your S3 buckets}
 \begin{itemize}
-\item Here is how to list your S3 buckets (\texttt{list\_buckets.rb})
+\item Here is how to list your S3 buckets:  (\texttt{aws\_app/s3/list\_buckets.rb})
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -446,7 +448,10 @@ developing\_cloud\_application\_bucket\\
 francisca.quintana}!
 \end{lstlisting}
 
-\item This is a simple yet powerful piece of code. We established a connection to S3, retrieved a list of buckets, iterate over the result, and printed the name of each bucket on a line of its own
+\item This is a simple yet powerful piece of code. We established a connection to S3, retrieved a list of buckets, 
+iterated over the result, and printed the name of each bucket
+
+\item \textbf{EXERCISE}: Modify the program so that the owner information and url are also displayed
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -462,8 +467,9 @@ $ gem install sinatra
 \end{lstlisting}
 
 
-\item There are numerous template engines available; \texttt{Erb}, \texttt{Haml}, and \texttt{Erubis} are
-just a few. We’ll use \texttt{Erb} for our templates as it’s fairly ubiquitous in the Ruby community these days, although any mature engine will do just fine as the usage is essentially the same in all cases
+\item There are several template engines available. \texttt{Erb}, \texttt{Haml}, and \texttt{Erubis} are
+just a few. We’ll use \texttt{Erb} for our templates as it’s fairly popular in the Ruby community these days, 
+although any mature engine will be fine
 
 \item Write the template view file \texttt{aws\_app/views/s3/list\_buckets.html.erb}
 
@@ -489,7 +495,7 @@ just a few. We’ll use \texttt{Erb} for our templates as it’s fairly ubiquito
 \end{lstlisting}
 
 
-\item Write the server code to server the page
+\item Write the server code to serve the page
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -507,7 +513,13 @@ get '/s3/list_buckets' do
 end
 \end{lstlisting}
 
-\item Curl to url \url{http://localhost:4567/s3/list_buckets}
+\item Run the server
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby server.rb
+\end{lstlisting}
+
+\item Curl (or access via web browser) to url \url{http://localhost:4567/s3/list_buckets}
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -515,7 +527,7 @@ end
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{Listing Objects in a Bucket}
 \begin{itemize}
- \item We list all the objects within the first bucket we created (using the constant \texttt{BOOK\_BUCKET})
+ \item We list all the objects within a bucket (using the constant \texttt{BOOK\_BUCKET} as a default)
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}
@@ -538,15 +550,18 @@ if ARGV.size > 1
 end
 bucket_name =  ARGV.size != 1 ? BOOK_BUCKET :  ARGV[0]
 
+# get an instance of the S3 interface using the default configuration
+s3 = AWS::S3.new
+
 begin
-  # get an instance of the S3 interface using the default configuration
-  s3 = AWS::S3.new
   bucket = s3.buckets[bucket_name]
   bucket.objects.each{|obj| puts obj.key }
 rescue Exception => e
   puts e.message
 end
 \end{lstlisting}
+
+\item \textbf{EXERCISE}: Modify the utility so that if no name is provided, then all the buckets are listed
 \end{itemize}
 
 \end{frame}
@@ -554,7 +569,7 @@ end
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{What happens with metadata?}
 \begin{itemize}
- \item We list all the objects within a bucket we some metadata (using the constant \texttt{BOOK\_BUCKET} as default)
+ \item We list all the objects within a bucket with some metadata (using \texttt{BOOK\_BUCKET} as a default)
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}
@@ -598,7 +613,8 @@ end
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{Listing Objects in a Bucket as a Web Page}
 \begin{itemize}
- \item We first write the method \texttt{get\_bucket\_objects} which simply calls \texttt{list\_objects} again and again until S3 says than are no more objects to return
+ \item We first write the method \texttt{get\_bucket\_objects} which simply calls \texttt{list\_objects} again 
+and again until S3 returns no more objects
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -616,8 +632,8 @@ def get_bucket_objects(s3, bucket_name, prefix = '') #!\circled{1}!
   options = {bucket_name: bucket_name, marker: '', max_keys: 8, prefix: prefix}
   begin
     objects = []
-    begin #!\circled{3}!
-      response = s3.client.list_objects options #!\circled{4}!
+    begin #!\circled{2}!
+      response = s3.client.list_objects options #!\circled{3}\circled{4}!
       response.data[:contents].each {|obj| objects << obj} #!\circled{5}!
       is_truncated = response.data[:truncated] #!\circled{6}!
       options[:marker] = objects[-1][:key] if is_truncated #!\circled{7}!
@@ -633,8 +649,8 @@ end
 \item \circled{1} Our function accepts three arguments: an AmazonS3 object, an S3 bucket, and a prefix value that defaults to an empty string.
 \item \circled{2} We use a \texttt{do \dots while} loop, so that the body of the loop always runs at least
 once
-\item \circled{3} Each time we call \texttt{list\_objects}, we pass in a value called \texttt{marker}, The first time it is an empty string. On subsequent loop iterations it is set to the final key returned on the previous iteration
-\item \circled{4} If the \texttt{list\_objects} call fails, the function throw an exception
+\item \circled{3} Each time we call \texttt{list\_objects}, we pass in a value called \texttt{marker}. First time it is an empty string. On subsequent loop iterations it is set to the final key returned on the previous iteration
+\item \circled{4} If the \texttt{list\_objects} call fails, the function throws an exception
 \item \circled{5} We retrieve the Contents array from the body of the response returned to our
 \texttt{list\_objects} call, then loop through the values storing each one in the \texttt{objects} array. This array will eventually be our return value.
 \item \circled{6} The data returned by a call to \texttt{list\_objects} includes an element named
@@ -647,7 +663,7 @@ loop
 
 
 
-\item The we write the template view file \texttt{aws\_app/views/s3/list\_bucket\_objects.html.erb}
+\item Now we write the template view file \texttt{aws\_app/views/s3/list\_bucket\_objects.html.erb}
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=?]
 <!DOCTYPE html>
@@ -677,7 +693,7 @@ loop
 </html>
 \end{lstlisting}
 
-\item Next step is to add an entry in file \texttt{server.rb} to
+\item Next step is to add an entry in file \texttt{server.rb} to serve this page too
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -694,11 +710,12 @@ get '/s3/list_bucket_objects' do
   erb :'/s3/list_bucket_objects.html'
 end
 \end{lstlisting}
-\item Finally, curl the url on the local server
+\item Remember that after every change in the server you must restart it
+\item Finally, curl the url on the local server (or access via web browser)
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-  $ http://localhost:4567/s3/list_bucket_objects
-  $ http://localhost:4567/s3/list_bucket_objects?bucket_name=!\dots!
+  $ curl http://localhost:4567/s3/list_bucket_objects
+  $ curl http://localhost:4567/s3/list_bucket_objects?bucket_name=!\dots!
 \end{lstlisting}
 
 \end{itemize}
@@ -709,7 +726,7 @@ end
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{A bit of Don't Repeat Yourself}
 \begin{itemize}
- \item The DRY principle is stated as ``Every piece of knowledge must have a single, unambiguous, authoritative representation within a system''
+ \item The \textbf{Don`t Repeat Yourself} (DRY) principle is stated as ``Every piece of knowledge must have a single, unambiguous, authoritative representation within a system''
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -748,8 +765,8 @@ end
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{Upload Files}
 \begin{itemize}
- \item We will add two more utility method to our \texttt{book.inc.rb} file. The first method is called \texttt{upload\_object}
-
+ \item We will add two more utility methods to our \texttt{book.inc.rb} file: \texttt{guess\_type} and \texttt{upload\_object}
+ \item \texttt{upload\_object} will upload an object to an S3 bucket (with retry)
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -777,7 +794,7 @@ def upload_object( s3, bucket, key, data, content_type, acl = :public_read)
 end
 \end{lstlisting}
 
-\item Our next function helps us determine a file's content type:
+\item \texttt{guess\_type} determines a file's content type
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -809,7 +826,7 @@ def guess_type( file_name )
   end
 end
 \end{lstlisting}
-\item Putting it all together with some argument processing, looping, and
+\item Putting it all together with some argument processing and looping, and
 we have a handy command to upload one or more files to S3:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -846,7 +863,7 @@ file_names.each do |file_name|
 end
 \end{lstlisting}
 
-\item Run \texttt{upload\_file} utility
+\item Run the \texttt{upload\_file} utility
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ find . -name "*.rb" | xargs ruby s3/upload_file.rb -
@@ -861,10 +878,9 @@ $ ruby s3/list_bucket_objects.rb
 \frametitle{Creating and Storing Thumnail Images}
 \begin{itemize}
 \item Our next utility function will take an in-memory image, figure out the appropriate
-height and width for a thumbnail, and then create the thumbnail
-\item Firstly, in \texttt{our book.inc.rb} file, we need to create two constants; one to store the
-desired thumbnail size, and one to store the default name for the bucket that will
-store our thumbnails
+height and width for a thumbnail, and then will create the thumbnail
+\item Firstly, in \texttt{our book.inc.rb} file, we need to create two constants to store the
+desired thumbnail size and the default suffix for the buckets that will store our thumbnails
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
@@ -879,7 +895,7 @@ THUMB_SIZE = 200
 THUMB_BUCKET_SUFFIX = '-thumbs'
 \end{lstlisting}
 
-\item Here’s the code for the thumbnail image function; once again, this goes into our \texttt{book.inc.rb} file:
+\item Here’s the code for the thumbnail image function; once again, this goes inside our \texttt{book.inc.rb} file:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -914,7 +930,7 @@ end
 !\vdots!
 \end{lstlisting}
 
-\item We also need to install \texttt{mini\_magick} gem
+\item We also need to install the \texttt{mini\_magick} gem to process images
 
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
@@ -922,8 +938,8 @@ $ gem install mini_magick
 \end{lstlisting}
 
 
-\item With this code in hand it is now a simple matter to do some argument processing
-and thumbnail each image in the given bucket. Here is how to do it:
+\item With this code in hand it is now simple to do some argument processing
+and thumbnail each image in a given bucket. Here is how to do it:
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #
@@ -976,7 +992,7 @@ bucket_in.objects.each do |obj|
 end
 \end{lstlisting}
 
-\item Run \texttt{thumbnail\_bucket} utility
+\item Run the \texttt{thumbnail\_bucket} utility
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $ find ~ -name "*.jpg" | xargs ruby s3/upload_file.rb -
@@ -1011,7 +1027,9 @@ bucket, it’s easier to just use a graphical interface to create your distribut
 The AWS Management Console makes it very simple; select the Amazon
 CloudFront tab and click the Create Distribution button
 
-\item Create two CloudFront distributions associated with both origin and thumb image buckets. Once set up, you will have to wait several minutes while the CloudFront distribution is created
+\item Create two CloudFront distributions associated with both origin and thumb image buckets, with the default options.
+ Once set up, you will have to wait several minutes while the CloudFront distribution is created. It will also take some
+ minutes to have the objects available.
 \item We will use CloudFront for efficient global distribution of the original and thumbnailed images
 
 \end{itemize}
@@ -1050,7 +1068,7 @@ distributions[:items].each do |distribution|
 end
 \end{lstlisting}
 
-\item Run \texttt{list\_distribution} utility
+\item Run the \texttt{list\_distribution} utility
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
 $  ruby s3/list_distributions.rb 
@@ -1063,13 +1081,13 @@ Domain name = d1xhkx9ok8zmm7.cloudfront.net\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Listing S3 Files with Thumbnails with CloudFront}
+\subsection{Listing S3 Files with Thumbnails using CloudFront distributions}
 \begin{frame}[fragile,allowframebreaks]
-\frametitle{Listing S3 Files with Thumbnails with CloudFront}
+\frametitle{Listing S3 Files with Thumbnails using CloudFront distributions}
 \begin{itemize}
 \item We first need one more utility function
-to make this work: the  function that will return the
-CloudFront distribution for a given S3 bucket. You guessed it, we’ll put this one in
+to make this work: the function that will return the
+CloudFront distribution for a given S3 bucket. You guessed it, we’ll put it in
 our \texttt{book.inc.rb} file:
 
 \lstset{language=Ruby, style=eclipse}
@@ -1094,15 +1112,16 @@ def find_distribution_for_bucket cloud_front, bucket
       return distribution if item[:domain_name] =~ /^#{bucket}.s3.amazonaws.com$/
     end
   end
+  nil
 end
 \end{lstlisting}
 
 \item This function accepts a CloudFront access object and the name of a bucket. It fetches
 the list of CloudFront distributions and attempts to match each one to the supplied
-bucket name. If a match is made, the distribution object is returned
+bucket name. If a match is made, the distribution object is returned. If not, a nil value is returned.
 
-\item The code below is an enhanced version of \texttt{list\_bucket\_objects\_page.rb}, as seen
-earlier in this chaptre. It adds a thumbnail to the table for all the image objects in
+\item The code below is an enhanced version of \texttt{list\_bucket\_objects\_page.rb}, already seen
+in this chapter. It adds a thumbnail to the table for all the image objects in
 the bucket that also have a corresponding image in the thumbnail bucket. It also
 uses the CloudFront URL if available:
 
@@ -1139,7 +1158,7 @@ def get_file_list( s3, cloud_front, bucket_name, thumb_bucket_name )
 
     file_list << { key: key, size: object[:size], url: "#{url}/#{key}", thumb_url: thumb_uri}
     return file_list if file_list.size > 10
-  end
+  end unless objects.nil ?
   file_list
 end
 
@@ -1249,8 +1268,8 @@ end
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Homework}
 \begin{itemize}
-\item  S3 Filesystem (with Elastic Drive? witn s3fs?)
-\item \texttt{s3 sync}
+\item  OPTIONAL: S3 Filesystem (with Elastic Drive? with s3fs?)
+\item \texttt{S3 sync: Develop at least one of the following versions of the sync utility}
 \begin{enumerate}
 \item The following \texttt{sync} command syncs objects under a specified prefix and bucket to files in a local directory by uploading the local files to \acrshort{s3}. A local file will require uploading if the size of the local file is different than the size of the \acrshort{s3} object, the last modified time of the local file is newer than the last modified time of the \acrshort{s3} object, or the local file does not exist under the specified bucket and prefix. In this example, the user syncs the bucket mybucket to the local current directory. The local current directory contains the files \texttt{test.txt} and \texttt{test2.txt}. The bucket mybucket contains no objects
 

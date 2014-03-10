@@ -122,7 +122,7 @@
 
 \item With \acrshort{sqs}, you can offload the administrative burden of operating and scaling a highly available messaging cluster, while paying a low price for only what you use.
 
-\item Service Highlights
+\item Service Highlights:
 \begin{itemize}
 \item Reliable. Amazon \acrshort{sqs} runs within Amazon’s high-availability data centers, so queues will be available whenever applications need them. To prevent messages from being lost or becoming unavailable, all messages are stored redundantly across multiple servers and data centers
 \item Scalable
@@ -146,11 +146,11 @@ posted or retrieved for 30 consecutive days
 \item Every queue is identified by a unique queue URL. The URL is assigned when the
 queue is created. All the operations on a queue require the specification of a queue
 URL
-\item Queues are used to store messages. Messages can be up to 8,192 bytes long. Due to
+\item Queues are used to store messages. Messages can be up to 8KB long. Due to
 this low limit, messages should generally be used to pass pointers (for example,
 URLs) to data stored elsewhere. Amazon \acrshort{s3} is often a good place to store data while
 it’s being passed through a complex processing pipeline
-certificate
+
 \item Instead of being automatically deleted, a message retrieved from \acrshort{sqs} becomes
 temporarily invisible so that it’s unable to be retrieved a second time. Once your
 code retrieves a message, you have a certain amount of time—the visibility
@@ -161,7 +161,7 @@ of an application failure. The default value for the visibility timeout is 30 se
 and the maximum value is 12 hours
 
 \item When you retrieve a message from SQS, you also gain a receipt handle. You need
-to hold on to this handle in order to delete the message after you’ve processed it.
+to hold on this handle in order to delete the message after you’ve processed it
 
 \item Queues have a time limit: unprocessed messages will be silently deleted from the
 queue after four days
@@ -181,19 +181,18 @@ access to each aspect of SQS
 messages in the same order that they were sent. Your application logic must be
 written so that it avoids relying on receiving messages in any particular order
 \item \emph{Message Delivery}\\ Under very rare circumstances, SQS can return the same message more than
-once. Your application can either treat messages as idempotent (so that pro-
-cessing the same one more than once has no ill affect), or it can store a state
+once. Your application can either treat messages as idempotent (so that processing the same one more than once has no ill affect), or it can store a state
 indicator in another location, such as Amazon SimpleDB.
 \item \emph{Message Sampling}\\When your application asks SQS to return a message from a queue, SQS checks
 a subset of the actual set of servers used to store the queue. If a queue contains
 less than 1,000 items, the first retrieval may return no items but a second one
-will
+will return them
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
 \frametitle{Operations}
-As you’ll soon see, the SQS programming model is very simple. You can:
+The SQS programming model is very simple. You can:
 \begin{itemize}
 \item create and delete queues from your account, and list your queues
 \item send, receive, and delete messages, and change message attributes such as the
@@ -209,7 +208,7 @@ visibility timeout
 \item \emph{Request}\\You pay \$0.01 (one cent) for every 10,000 SQS requests that you make. This is
 equivalent to a price of \$0.000001 per request. Although the per-request price is very low, you still need to be careful
 \item \emph{Data}\\Your data transfer charges are based on the amount of data transferred in and out
-of SQS. Data transferred into SQS is charged at a rate of \$0.10 per gigabyte. Once
+of SQS. Data transferred into SQS is charged at a rate the \$0.10 per gigabyte. Once
 again, this amount is prorated. Data transferred out of SQS is charged on a sliding
 scale starting at \$0.17 per gigabyte and decreasing with volume, reaching \$0.10 per
 gigabyte for all outgoing data transfer in excess of 150 terabytes per month
@@ -234,7 +233,7 @@ gigabyte for all outgoing data transfer in excess of 150 terabytes per month
 \begin{frame}[fragile]
 \frametitle{Creating Queues}
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/sqs/create_queues.rb
 #
@@ -258,7 +257,7 @@ end
 \begin{frame}[fragile]
 \frametitle{Listing Queues}
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/sqs/list_queues.rb
 #
@@ -289,7 +288,7 @@ https://sqs.us-east-1.amazonaws.com/015850082106/c\_url}!
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Inserting Items into Queues}
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/sqs/post_queue.rb
 #
@@ -297,7 +296,7 @@ https://sqs.us-east-1.amazonaws.com/015850082106/c\_url}!
 #
 require File.expand_path(File.dirname(__FILE__) + '/../config')
 
-(queue_name, *messages) = ARGVcertificate
+(queue_name, *messages) = ARGV
 abort "Usage: #{__FILE__}  <QUEUE_NAME>  <MESSAGE> ..." unless queue_name && messages.size != 0
 
 # get an instance of the SQS interface using the default configuration
@@ -319,9 +318,9 @@ end
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Extracting Items from Queues}
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
-# aws_app/sqs/post_queue.rb
+# aws_app/sqs/pull_queue.rb
 #
 # Usage: ruby pull_queue.rb <QUEUE_NAME>
 #
@@ -363,7 +362,7 @@ queue.poll(:initial_timeout => false,
 \begin{lstlisting}[escapechar=&]
 $ ruby sqs/create_queue perdidita
 $ ruby sqs/post_queue.rb perdidita 'Hello World!"
-$ ruby sqs/pull_queue.rb perdiditacertificate
+$ ruby sqs/pull_queue.rb perdidita
 &\outputcommand{\\
 be patient \dots\\
 Hello World!
@@ -371,14 +370,10 @@ Hello World!
 \end{lstlisting}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Building a Image Crawler}
+\section{Building an Image Crawler}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Building a Image Crawler}
-
-\begin{center}
- \includegraphics[ width= 0.5 \textwidth]{image-crawler.jpg}
-\end{center}
+\frametitle{Building an Image Crawler}
 
 
 \begin{itemize}
@@ -393,33 +388,27 @@ will contain all the scaled images from the original page.
 \end{enumerate}
 \end{itemize}
 
-\lstset{language=shell}
-\begin{lstlisting}[escapechar=&]
-$ ruby sqs/create_queue perdidita
-$ ruby sqs/post_queue.rb perdidita 'Hello World!"
-$ ruby sqs/pull_queue.rb perdiditacertificate
-&\outputcommand{\\
-be patient \dots\\
-Hello World!
-}&
-\end{lstlisting}
+\begin{center}
+ \includegraphics[ width= 0.5 \textwidth]{image-crawler.jpg}
+\end{center}
+
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Definitions and Utility Functions}
+\frametitle{Definitions}
 
 \lstset{language=Ruby, style=eclipse}
 
 \begin{itemize}
-\item Because each queue will be referenced by several processes, let’s define some symbolic names for them in a new  book.inc.php file:
+\item Because each queue will be referenced by several processes, let’s define some symbolic names for them in a new  \texttt{book.inc.rb} file:
 
 \begin{lstlisting}[escapechar=&]
 #
 # aws_app/crawler/book.inc.rb
 #
-# This file define constant to crawler application
+# This file defines constant fot the crawler application
 
 URL_QUEUE = 'c_url'
 PARSE_QUEUE = 'c_parse'
@@ -479,13 +468,13 @@ end
 
 \item The URL and some additional information are bundled as an array. We then call
 the json\_encode function to convert the array into a JSON value (the message
-stored in the variable \texttt{message}) and the send\_message method to post it to the
+stored in the variable \texttt{message}) and finally call the \texttt{send\_message} method to post it to the
 \texttt{URL\_QUEUE queue}
 
 \item Here’s how to use this tool:
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ ruby crawler/load\_crawl\_urls.rb http://www.freedigitalphotos.net/images/People\_g40.html http://www.sxc.hu/category/115 http://www.stockfreeimages.com/c1/it-c/connectivity.html http://www.turbophoto.com/Sports.html
+$ ruby crawler/load_crawl_urls.rb http://www.freedigitalphotos.net/images/People_g40.html
 !\outputcommand{Posted message \{"action":"Fetchpage","origin":"crawler/load\_crawl\_urls.rb","data":"http://www.freedigitalphotos.net/images/People\_g40.html","history":"Posted by crawler/load\_crawl\_urls.rb at 2014-02-24 10:47:22 +0000"\} to queue https://sqs.us-east-1.amazonaws.com/015850082106/c\_url\\
 \dots}!
 \end{lstlisting}
@@ -518,7 +507,7 @@ pipeline:
 HTML at the URL. It stores the HTML in Amazon S3 and then passes the work along
 to the next stage in the pipeline by writing a message to the \texttt{PARSE\_QUEUE} queue
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/crawler/fetch_page.rb
 #
@@ -591,9 +580,9 @@ Posted message\\ {"action":"ParsePage","origin":"crawler/fetch\_page.rb","page\_
 \item This stage pulls the raw HTML from
 S3, parses it using a third-party HTML parser, extracts some of the image links, and
 passes those links on to the next stage
-\item To simplify this example, we’ll only process images that have an relative URL
+\item To simplify this example, we’ll only process images that have a relative URL
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/crawler/parse_page.rb
 #
@@ -663,10 +652,10 @@ Processing image ["http://www.freedigitalphotos.net/images/cart.png", "http://ww
 \frametitle{Stage 3 - Fetching Image URLs}
 \begin{itemize}
 \item This stage takes the array of image URLs from the previous stage, and fetches each
-one. It then uses the \texttt{thumbnail\_image} function that we wrote  to scale
+one. It then uses the \texttt{thumbnail\_image} function defined in \texttt{s3/book.inc.rb} that we wrote  to scale
 the image to a smaller size, as defined by the \texttt{THUMB\_SIZE} constant
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/crawler/fetch_images.rb
 #
@@ -750,7 +739,7 @@ $ ruby crawler/fetch_images.rb
 before generating a thumbnail mosaic image
 
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=&]
+\begin{lstlisting}
 #
 # aws_app/crawler/render_image.rb
 #
@@ -819,7 +808,7 @@ image\_location = http://s3.amazonaws.com/developing\_cloud\_application\_bucket
 "Stored final image in S3 using key final\_image\_d6fe8533d597552e2858a793abd937e8.png. URL:http://s3.amazonaws.com/developing\_cloud\_application\_bucket/final\_image\_d6fe8533d597552e2858a793abd937e8.png"}!
 \end{lstlisting}
 
-\item You can run all proccess together writting \texttt{fetch\_page \&; parse\_page \&; fetch\_image \&; render\_image \& } and then run \texttt{load\_crawl\_url \dots} to start filling the first queue
+\item You can run all proccess together writting \texttt{\$ ruby fetch\_page \&; ruby parse\_page \&; ruby fetch\_image \&; ruby render\_image \& } and then run \texttt{\$ ruby load\_crawl\_url \dots} to start filling the first queue
 \end{itemize}
 
 \end{frame}
