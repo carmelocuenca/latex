@@ -187,6 +187,7 @@ request
 
 \end{itemize}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
@@ -234,6 +235,7 @@ end
 \end{itemize}
 
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
 \frametitle{List Domains}
@@ -258,16 +260,17 @@ end
 \end{lstlisting}
 
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Storing Data}
 \begin{itemize}
 \item The next step is to store some data in a domain. This is done using the
-\texttt{put\_attributes} method. This method can be used to create new items or to add
+\texttt{put} method. This method can be used to create new items or to add
 additional attributes to existing items
 
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=!]
+\begin{lstlisting}
 #
 # aws_app/simpledb/insert_items.rb
 #
@@ -296,21 +299,423 @@ end
 \end{lstlisting}
 \end{itemize}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Storing Multiple Items Efficiently}
 \begin{itemize}
-\item The next step is to store some data in a domain. This is done using the
-\texttt{put\_attributes} method. This method can be used to create new items or to add
-additional attributes to existing items
+\item Another SimpleDB function, \texttt{batch\_put\_attributes}, can be used to perform multiple
+\texttt{put} attributes calls with a single request. This can be faster and more efficient
+than making a long series of individual requests. Here's a modified version of the
+previous example that uses the batch requests
 
 \lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=!]
+\begin{lstlisting}
+#
+# aws_app/simpledb/batch_insert_items.rb
+#
+# Usage: ruby simpledb/batch_insert_items.rb
+#
 
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+items = []
+
+Dir.entries('.').select{ |file| file.match(/^[a-zA-Z0-9_-]*\.rb$/)}.each do |filename|
+  File.open filename do |f|
+    data = f.read
+    size = f.size
+    md5 = Digest::MD5.hexdigest data
+
+    items << { name: filename,
+               attributes: [ {name: 'name', value: filename, replace: false},
+                             {name: 'md5', value: md5, replace: true},
+                             {name: 'size', value: "%08d" % size, replace: true}
+               ]
+    }
+  end
+  if items.size == 10
+    response = sdb.client.batch_put_attributes domain_name: BOOK_FILE_DOMAIN, items: items
+    puts response.data.to_s
+    items.clear
+  end
+end
+
+if items.size > 0
+  response = sdb.client.batch_put_attributes domain_name: BOOK_FILE_DOMAIN, items: items
+  puts response.data.to_s
+end
 \end{lstlisting}
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\end{document}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Running a Query}
+\begin{itemize}
+\item With the data stored, running queries is simple:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/simpledb/query_domain.rb
+#
+# Usage: ruby simpledb/query_domain.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+# seleccionar los archivos cuyo nombre empiece por list
+# query = "select * from #{BOOK_FILE_DOMAIN} where name like 'list%'"
+
+# to select files with size > 1000 bytes
+query = "select * from #{BOOK_FILE_DOMAIN} where size > '00001000'"
+
+begin
+  result = sdb.client.select select_expression: query
+  puts result.data[:items]
+end while result.data[:next_token]
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Advanced Queries}
+\begin{itemize}
+\item SimpleDB queries have the following general form:
+\lstset{language=Ruby}
+\begin{lstlisting}
+select output_list
+from domain_name
+[where expresion]
+[order by clause]
+[limit clause]
+\end{lstlisting}
+
+\item The optional \texttt{where} expressions are a combination of \texttt{attribute names}, \texttt{constant
+values}, \texttt{item name}, and \texttt{operators}. The following list shows the most used operators that
+can be used in the \texttt{where} expression:
+\begin{itemize}
+\item \texttt{=, !=, >, >=, <, <=, and, or}
+\item \texttt{like} (contains the specified constant, with “\%” as a wildcard,) \texttt{not like}
+\item \texttt{between/and} (In a specified range), \texttt{in} (Matches an item from a list)
+\item \texttt{is null } (Attribute does not exist), \texttt{is not null}, \texttt{every} (Every value of a multi-valued attribute satisfies the expression)
+\end{itemize}
+
+\item We would like to execute 
+\lstset{language=shell}
+\begin{lstlisting}
+$ ruby simpledb/query_domain_cmd.rb "size > '00001000'"
+\end{lstlisting}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/simpledb/query_domain_cmd.rb
+#
+# Usage: ruby simpledb/query_domain_cmd.rb "size > '00001000'"
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+query = "select * from #{BOOK_FILE_DOMAIN.to_s} "
+query += "where #{ARGV.join ' '}" unless ARGV.size == 0
+
+puts "Final query: #{query}"
+
+begin
+  result = sdb.client.select select_expression: query
+  puts result.data[:items]
+end while result.data[:next_token]
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Augmenting Items with Additional Data}
+\begin{itemize}
+\item Once an item has been created, additional calls to the \texttt{put\_attributes} method can
+be used to create additional attributes or additional values for an existing attribute.
+Let’ s augment each item in the \texttt{BOOK\_FILE\_DOMAIN with the file’ s modification time}
+using this script:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/simpledb/augmented_items.rb
+#
+# Usage: ruby simpledb/augmented_items.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+query = "select name from #{BOOK_FILE_DOMAIN}"
+
+begin
+  result = sdb.client.select(select_expression: query)
+  result.data[:items].each do |item|
+    mod_time = File.mtime item[:name]
+    puts item[:name], mod_time.to_s
+
+    db_item = sdb.domains[BOOK_FILE_DOMAIN].items[item[:name]]
+    db_item.attributes.put( replace: { mod_time: mod_time.to_s } )
+  end
+end while result.data[:next_token]
+
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Augmenting Items with Additional Data}
+\begin{itemize}
+\item Once an item has been created, additional calls to the \texttt{put\_attributes} method can
+be used to create additional attributes or additional values for an existing attribute.
+Let’ s augment each item in the \texttt{BOOK\_FILE\_DOMAIN with the file’ s modification time}
+using this script:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/simpledb/augmented_items.rb
+#
+# Usage: ruby simpledb/augmented_items.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+query = "select name from #{BOOK_FILE_DOMAIN}"
+
+begin
+  result = sdb.client.select(select_expression: query)
+  result.data[:items].each do |item|
+    mod_time = File.mtime item[:name]
+    puts item[:name], mod_time.to_s
+
+    db_item = sdb.domains[BOOK_FILE_DOMAIN].items[item[:name]]
+    db_item.attributes.put( replace: { mod_time: mod_time.to_s } )
+  end
+end while result.data[:next_token]
+
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Storing Multiple Values for an Attribute}
+\begin{itemize}
+\item Storing multiple values for a single attribute is very easy; there are two ways to do
+this.
+\begin{itemize}
+\item You can store multiple modification times using the code from the last section, with repeated
+calls like so
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/augmented_items.rb
+#
+# Usage: ruby simpledb/augmented_items.rb
+#
+!\vdots!
+    # A hash of attribute names and values to append to this item
+    db_item.attributes.put( add: { mod_time: mod_time.to_s } )
+!\vdots!
+\end{lstlisting}
+
+Then update modifed time and run the script
+
+\lstset{language=shell}
+\begin{lstlisting}
+$ touch *.rb
+$ ruby simpledb/augmented_items.rb
+\end{lstlisting}
+
+\item You can store sever al values at the same time like this:
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/augmented_items.rb
+#
+# Usage: ruby simpledb/augmented_items.rb
+#
+!\vdots!
+    db_item.attributes.put( replace: { mod_time: [mod_time.to_s, Time.now] } ) !\circle{1}!
+!\vdots!
+\end{lstlisting}
+
+
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Deleting Attributes}
+\begin{itemize}
+\item If you’ve no more need for an attribute, you can delete attributes it like this:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/delete_attributes.rb
+#
+# Usage: ruby simpledb/delete_attributes.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+query = "select name from #{BOOK_FILE_DOMAIN}"
+
+attributes = %W{mod_time flavor}
+begin
+  result = sdb.client.select(select_expression: query)
+  result.data[:items].each do |item|
+
+    db_item = sdb.domains[BOOK_FILE_DOMAIN].items[item[:name]]
+    db_item.attributes.delete(attributes )
+  end
+end while result.data[:next_token]
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Deleting Items}
+\begin{itemize}
+\item You can also delete an entire item, by deleting all the attributes. Here’ s how to do it:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+#
+# aws_app/simpledb/delete_items.rb
+#
+# Usage: ruby simpledb/delete_items.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+query = "select * from #{BOOK_FILE_DOMAIN} where name = 'config.rb'"
+
+begin
+  result = sdb.client.select(select_expression: query)
+  result.data[:items].each do |item|
+    db_item = sdb.domains[BOOK_FILE_DOMAIN].items[item[:name]]
+    db_item.attributes.delete( db_item.attributes.to_h )
+  end
+end while result.data[:next_token]
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Monitoring Domain Statistics}
+\begin{itemize}
+\item Here’ s a script that displays metadata domains:
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+#
+# aws_app/simpledb/metadata.rb
+#
+# Usage: ruby simpledb/metadata.rb
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../config')
+require File.expand_path(File.dirname(__FILE__) + '/book.inc')
+
+# get an instance of the SDB interface using the default configuration
+sdb = AWS::SimpleDB.new :region => 'us-east-1'
+
+sdb.domains.each do |domain|
+  puts "Domain: #{domain.name}: #{domain.metadata.to_h.to_s}"
+end
+\end{lstlisting}
+
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ ruby simpledb/metadata.rb
+!\outputcommand{Domain: feed\_items: {:item\_count=>0, :item\_names\_size\_bytes=>0, :attribute\_name\_count=>0, :attribute\_names\_size\_bytes=>0, :attribute\_value\_count=>0, :attribute\_values\_size\_bytes=>0, :timestamp=>1394701235}\\
+Domain: feeds: {:item\_count=>0, :item\_names\_size\_bytes=>0, :attribute\_name\_count=>0, :attribute\_names\_size\_bytes=>0, :attribute\_value\_count=>0, :attribute\_values\_size\_bytes=>0, :timestamp=>1394701235}\\
+Domain: files: {:item\_count=>1, :item\_names\_size\_bytes=>9, :attribute\_name\_count=>3, :attribute\_names\_size\_bytes=>11, :attribute\_value\_count=>3, :attribute\_values\_size\_bytes=>49, :timestamp=>1394701235}}
+\end{lstlisting}
+
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Homework}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Homework}
+
+\begin{itemize}
+\item Dado el localizador url de un sitio registrar la frecuencia de uso de todas las palabaras utilizadas como títulos en todas las páginas internas accesibles desde ese localizador. El título en un documento html está escrito entre etiqutas \verb%<h1></h1>% o \verb%<h2></h2>%, etc. Una posible diseño del servicio sería el siguiente:
+
+\begin{enumerate}
+\item 4 colas: url\_queue, title\_queue, url\_crawler\_queue, counter\_queue
+\item Un primer script que simplemente añade la url de partida (por ejemplo htttp://www.elpais.es) a la cola url\_queue
+\item Un proceso que recoge los mensajes en la cola url\_queue y descarga la página html al S3 y genera dos mensajes con la información de la localización
+de la página: una para la cola title\_queue y otro para la cola  url\_crawler\_queue
+\begin{enumerate}
+\item Otro proceso que recoge los mensajes en la cola title\_queue  y crea otro fichero S3 con texto plano con el contenido de los títulos y añade un mensaje a la cola counter\_queue
+\item Otro proceso que paralelamente al anterior coge url\_crawler\_queue busca url relativas al sitio y las añade a la cola url\_queue
+\end{enumerate}
+\item Un proceso más que toma el texto plano del fichero en el S3 indicado en el mensaje del la cola counter\_queue y registar en simpleDB la utilización de las palabras
+\end{enumerate}
+
+\item Detalles a tener en cuenta:
+\begin{itemize}
+\item Una página descargada debe marcarse con un item en simpleDB como tal para evitar bucles de descargas infinitos.
+\item ¿Transacciones en simpleDB? Cuando del último proceso hayan más de una instancia corriendo una implementación sin transacciones no funcionará. Ver Conditional Puts/Deletes
+\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

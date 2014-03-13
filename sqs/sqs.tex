@@ -332,7 +332,7 @@ abort "Usage: #{__FILE__} <QUEUE_NAME>" unless ARGV.size != 0
 sqs = AWS::SQS.new
 queue_name = ARGV[0]
 begin
-  queue = sqs.queues.named queue_names
+  queue = sqs.queues.named queue_name
 rescue
   abort "#{$!.class}: #{$!.message}"
 end
