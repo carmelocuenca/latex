@@ -248,11 +248,12 @@ end
 \begin{lstlisting}[escapechar=&]
 # config/routes.rb
 PhoneBookApp::Application.routes.draw do
-  root 'companies#index' # &\circled{1}&
-
   resources :employees
 
   resources :companies
+
+
+  root 'companies#index' # &\circled{1}&
 end
 \end{lstlisting}
 
@@ -530,14 +531,77 @@ or you might face some very confusing errors down the road
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Fragment Caching}
-\begin{frame}[fragile]
+\begin{frame}[fragile, , allowframebreaks]
 \frametitle{Fragment Caching}
 \begin{itemize}
 \item With fragment caching you can cache individual parts of a view. The advantages once again are a reduction of server load and faster web page generation, which means increased usubility
-\item Global Fragments. A fragment-cache content is keyed with a global string identifier
-\item Named Fragments. Cache contents is keyed to the URL of its parents
 
-\begin{itemize
+\item Reset the \texttt{index} and \texttt{show} methods in \texttt{app/controllers/companies\_controller.rb}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+def index
+    @companies = Company.all
+  end
+
+  # GET /companies/1
+  # GET /companies/1.json
+  def show
+  end
+\end{lstlisting}
+
+\item Edit the file \texttt{app/views/companies/index.html.rb}
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/views/companies/index.html.rb
+<h1>Listing companies</h1>
+
+<% cache('companies') do %>  <!-- &\circled{1}& -->
+  <table>
+&\vdots&
+  </table>
+<% end %>  <!-- &\circled{2}& -->
+
+<br>
+
+<%= link_to 'New Company', new_company_path %>
+\end{lstlisting}
+
+\item Go twice to web server root url
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ curl http://localhost:3000/companies
+!\outputcommand{Write fragment views/companies/a206e211f024c0985d3a493c599e70fb (0.9ms)\\
+  Rendered companies/index.html.erb within layouts/application (99.2ms)\\
+Completed 200 OK in {\color{red}552ms (Views: 520.7ms | ActiveRecord: 6.4ms)}
+}!
+$ curl http://localhost:3000/companies
+!\outputcommand{Read fragment views/companies/a206e211f024c0985d3a493c599e70fb (0.3ms)\\
+  Rendered companies/index.html.erb within layouts/application (6.1ms)\\
+Completed 200 OK in {\color{red}17ms (Views: 16.2ms | ActiveRecord: 0.0ms)}
+}!
+\end{lstlisting}
+
+\item It is possible to use Active record model as the cache key:
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/views/companies/index.html.rb
+&\vdots&
+<tbody>
+  <% @companies.each do |company| %>
+    <tr>
+      <% cache(company) do %> # &&
+        <td><%= company.name %></td>
+        <td><%= company.employees.count %></td>
+        <td><%= link_to 'Show', company %></td>
+        <td><%= link_to 'Edit', edit_company_path(company) %></td>
+        <td><%= link_to 'Destroy', company, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <% end %>
+    </tr>
+  <% end %>
+</tbody>
+&\vdots&
+\end{lstlisting}
+
 \end{itemize}
 
 \end{frame}
