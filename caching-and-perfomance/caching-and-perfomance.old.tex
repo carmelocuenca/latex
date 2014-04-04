@@ -1,0 +1,276 @@
+\documentclass{beamer}
+\usepackage[british,spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{hyperref}
+%\hypersetup{colorlinks=false,linkbordercolor=red,linkcolor=green,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{multirow}
+
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstloadlanguages{Ruby}
+\usepackage{cancel}
+
+\usepackage{adjustbox}
+\usepackage{lstcustom}
+
+\usepackage{amsmath}
+
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+\definecolor{lstbackgroundshellcolor}{named}{light-gray}
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[normalem]{ulem}
+
+
+%\usepackage[acronym,xindy,toc]{glossaries}
+
+\usepackage[acronym,xindy,toc]{glossaries}
+\makeglossaries
+%\usepackage[xindy]{imakeidx}
+%\makeindex
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\comment}[2]{#2}
+
+\newcommand{\commandinline}[1]{\lstinline[basicstyle=\small\lstfontfamily]{#1}}
+\newcommand{\outputcommand}[1]{\color{darkgreen}{#1}}
+
+\graphicspath{ {./images/} }
+
+\title{Caching and Perfomance}
+%\subtitle[short subtitle]{long subtitle}
+\author[C. Cuenca, F. Quintana]{Carmelo Cuenca-Hernández and Francisca Quintana-Domínguez}
+%\institute{Escuela Universitaria de Informática}
+%\date[04/2013]{Abril - 2013}
+\date{}
+\titlegraphic{\includegraphics[width=0.5 \textwidth]{./images/logo_ulpgc_version_horizontal_rgb.eps}}
+
+
+
+\pgfdeclareimage[width=2.0\baselineskip]{ulpgc-logo}{./images/logosimbolo_secundario_version_vertical}
+\setbeamertemplate{footline}{\raisebox{-2ex}{\pgfuseimage{ulpgc-logo}}
+  \usebeamerfont{date in head/foot}\insertshortdate{}\hfill
+  \usebeamertemplate{navigation symbols}\hfill
+  \insertframenumber{}/\inserttotalframenumber}
+\setbeamertemplate{sidebar right}{}
+
+
+\usetheme{Antibes}
+%\usetheme{Berlin}
+
+%\usetheme{Warsaw}
+%\usecolortheme{albatross}
+
+\selectlanguage{british}
+
+
+
+\begin{document}
+
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+
+\section*{Outline}
+\begin{frame}[fragile, allowframebreaks]
+  \frametitle{Outline}
+  %\tableofcontents%[part=1,pausesections]
+  %\tableofcontents[currentsection,currentsubsection, sectionstyle=show] 
+  \tableofcontents[currentsection,sectionstyle=show,hideothersubsections]
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newacronym{<label>}{<abbrv>}{<full>}
+%\glsreset{<label>}
+%\glsresetall
+%\acrlong{<label>}
+%\acrfull{<label>}
+%\acrshort{<label>}
+%\input{../glossary}
+
+\newacronym{ror}{RoR}{{\href{http://rubyonrails.org/}{Ruby on Rails}}}
+\newacronym{rds}{RDS}{Relational Database Service}
+\newacronym{rvm}{RVM}{{\href{https://rvm.io/}{Ruby Version Manager}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sample App}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Sample App}
+\begin{itemize}
+\item 
+\end{itemize}
+
+\begin{tabular}{|l|l|} \hline
+Controller & Action \\ \hline
+\texttt{static\_pages} & \texttt{home}, \texttt{help}, \texttt{about}, \texttt{contact} \\ \hline
+\texttt{users} & \specialcell[l]{\texttt{new}, \texttt{show}, \texttt{index}, \texttt{create}, \texttt{edit} \\ \texttt{update}, \texttt{following}, \texttt{followers}}\\ \hline
+\texttt{sessions} & \texttt{new}, \texttt{create}, \texttt{destroy} \\ \hline
+\texttt{micropost} & \texttt{create}, \texttt{destroy}\\ \hline
+\texttt{relationships} & \texttt{create}, \texttt{destroy}\\ \hline
+\end{tabular}
+
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{View Caching}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{View Caching}
+\begin{itemize}
+\item Rails application could be very responsive and scalable (YellowPages (top 40), GitHub,Twitter, Groupon, SlideShare (60 millions monthly visitors))
+\item View caching lets you specify that anything from entire pages down to fragments of the page should be captured to ``disk'' as HTML files and sent along by your web server on future request with minimal involvement from Rails itself
+\begin{enumerate}
+\item Page caching. The output of an entire controller is cached to disk, with no further involvement by the Rails dispatcher
+\item Action caching. The output of an entire controller action is cached to disk, but he Rails dispatcher is still involved in subsequent requests, and controller filters are executed
+\item Fragment Caching. Arbitrary bits and pieces of your page’s output can be cached to disk
+to save the time of having to render them in the future
+\end{enumerate}
+\item ETag support means that in the best-case scenarios, it's not even necessary to send any content at all back to the browser, beyond a couple of HTTP headers
+
+\item Page Caching has been removed from Rails 4 so we have to install a gem for that\dots
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ echo "gem 'actionpack-page_caching'" >> Gemfile
+$ bundle install
+\end{lstlisting}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Caching in Development Mode?}
+\begin{itemize}
+\item If we want to play with caching during development, we’ll need to edit the following setting in the \texttt{config/environments/development.rb} file:
+
+\lstset{language=shell}
+\begin{lstlisting}
+config.action_controller.perform_caching = false
+\end{lstlisting}
+
+\item Of course, remember to change it back before checking it back into your project repository,
+or you might face some very confusing errors down the road
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Page Caching}
+\begin{frame}[fragile]
+\frametitle{Page Caching}
+\begin{itemize}
+\item The simplest form of caching is page caching, triggered by use of the \texttt{caches\_page}
+macro-style method in a controller
+\item It tells Rails to capture the entire output of the
+request to disk so that it is served up directly by the web server on subsequent requests
+without the involvement of the dispatcher
+\item Nothing will be logged to the Rails log, nor
+will controller filters be triggered—absolutely nothing to do with Rails will happen, just
+like the static HTML files in your project’s public directory
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Page Caching - Home Page}
+\begin{itemize}
+\item Run Rails server and  visit the \texttt{sample\_app home page} in order to get measures of ``views time'' and ``active record time''
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ curl http://localhost:3000
+!\outputcommand{Started GET "/" for 127.0.0.1 at 2014-04-02 12:43:15 +0100\\
+Processing by StaticPagesController\#home as */*\\
+\vdots
+  Rendered layouts/\_header.html.erb (1.8ms)\\
+  Rendered layouts/\_footer.html.erb (0.6ms)\\
+Completed 200 OK in 39ms (Views: 26.4ms | ActiveRecord: 0.5ms)\\
+}!
+\end{lstlisting}
+
+\item To add page caching to the home page it is necessary to modify the files \texttt{config/routes.rb} and \texttt{app/controllers/static\_pages\_controller.rb}. 
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=!]
+# config/routes.rb
+!\vdots!
+  match '/public',  to: 'static_pages#public', via: 'get'
+  match '/', to: 'static_pages#home', via: 'get'
+!\vdots!
+\end{lstlisting}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}
+# app/controllers/static_pages_controller.rb
+class StaticPagesController < ApplicationController
+  before_filter :check_logged_in, only: [:home]
+
+  caches_page :public
+
+  def public
+    render :home
+  end
+
+  def home
+    @micropost = current_user.microposts.build
+    @feed_items = current_user.feed.paginate(page: params[:page])
+  end
+
+  def help
+  end
+
+  def about
+  end
+
+  def contact
+  end
+
+  private
+
+  def check_logged_in
+    redirect_to public_path unless signed_in?
+  end
+
+end
+\end{lstlisting}
+
+\item Get new measures of ``views time'' and ``active record time''
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+$ $ curl http://localhost:3000
+!\outputcommand{Started GET "/" for 127.0.0.1 at 2014-04-02 15:03:42 +0100\\
+\vdots
+Completed 302 Found in 19ms (ActiveRecord: 0.5ms)\\
+}!
+\end{lstlisting}
+
+\item The web server wrote the page in the location \texttt{public/static\_pages/public.html}
+
+\item Run the rspec test to check the color of the refactoring
+
+\lstset{language=shell}
+\begin{lstlisting}
+$ spec rspec/
+\end{lstlisting}
+\end{itemize}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Homeworks}
+\begin{frame}[fragile]
+\frametitle{Homeworks}
+\begin{itemize}
+\item 
+\end{itemize}
+
+\end{frame}
+\end{document}
