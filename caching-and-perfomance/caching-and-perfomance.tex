@@ -118,12 +118,6 @@
 to save the time of having to render them in the future
 \end{enumerate}
 
-\item Page Caching has been removed from Rails 4 so we have to install a gem for that\dots
-\lstset{language=shell}
-\begin{lstlisting}[escapechar=!]
-$ echo "gem 'actionpack-page_caching'" >> Gemfile
-$ bundle install
-\end{lstlisting}
 \end{itemize}
 
 \end{frame}
@@ -146,14 +140,51 @@ $ cd new phone_book_app/
 $ echo '2.0.0' > .ruby-version; echo 'phone_book_app' > .ruby-gemset
 \end{lstlisting}
 
+\item Create a repository  with git (\texttt{git init}) and edit \texttt{.gitignore} file
+
+\lstset{language=shell}
+\begin{lstlisting}
+# .gitignore
+# Ignore bundler config.
+/.bundle     
+         
+# Ignore the default SQLite database.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+     
+# Ignore all logfiles and tempfiles.
+/log/*.log
+/tmp
+
+# Ignore other unneeded files.
+doc/
+*.swp
+*~
+.project
+.DS_Store
+.idea
+bundler_stubs/
+\end{lstlisting}
+
 \item Add and install some gems
 
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 # Gemfile
+source 'https://rubygems.org'
+# !\circled{1}!
+ruby '2.0.0'
+#ruby-gemset=phone_book_app
 !\vdots!
+# !\circled{2}!
+# Use sqlite3 as the database for Active Record
+group :test, :development do
+  gem 'sqlite3'
+end
+!\vdots!
+# !\circled{3}!
 gem 'faker'
-
+# !\circled{4}!
 group :production do
   gem 'pg', '0.15.1'
   gem 'rails_12factor', '0.0.2'
@@ -169,7 +200,7 @@ $ bundle install --without production
 \item Generate two scaffolds
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ rails generate scaffold company name --no--test-framework
+$ rails generate scaffold company name state --no--test-framework
 !\outputcommand{[\dots]}!
 $ rails generate scaffold employee company:references last_name first_name phone_number --no-test-framework
 !\outputcommand{[\dots]}!
@@ -183,6 +214,7 @@ $ rake db:migrate
 # app/models/company.rb
 class Company < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
+  validates :state, presence: true
   has_many :employees, dependent: :destroy
 
   def to_s
@@ -217,6 +249,7 @@ end
   <thead>
     <tr>
       <th>Name</th>
+      <th>State</th>
       <th>Number of employees</th> <!-- &\circled{1}& -->
       <th></th>
       <th></th>
@@ -228,6 +261,7 @@ end
     <% @companies.each do |company| %>
       <tr>
         <td><%= company.name %></td>
+        <td><%= company.state %></td>
         <td><%= company.employees.count %></td> <!-- &\circled{2}& -->
         <td><%= link_to 'Show', company %></td>
         <td><%= link_to 'Edit', edit_company_path(company) %></td>
@@ -262,10 +296,11 @@ end
 \begin{lstlisting}[escapechar=&]
 # db/seeds.rb
 
-64.times do
-  company = Company.new(name: Faker::Company.name)
+256.times do
+  company = Company.new(name: Faker::Company.name,,
+                        state: Faker::Address.state)
   if company.save ETag support 
-    SecureRandom.random_number(128).times do
+    SecureRandom.random_number(32).times do
       company.employees.create(first_name: Faker::Name.first_name,
                                last_name: Faker::Name.last_name,
                                phone_number: Faker::PhoneNumber.phone_number)
@@ -514,7 +549,7 @@ Cache-Control: {\color{red}{public}}\\
 \begin{itemize}
 \item If we want to play with caching during development, we’ll need to edit the following setting in the \texttt{config/environments/development.rb} file:
 
-\lstset{language=shell}
+\lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=!]
 #config/environments/development.rb
 !\vdots!
@@ -528,7 +563,6 @@ or you might face some very confusing errors down the road
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Fragment Caching}
 \begin{frame}[fragile, , allowframebreaks]
@@ -555,7 +589,7 @@ def index
 # app/views/companies/index.html.rb
 <h1>Listing companies</h1>
 
-<% cache('companies') do %>  <!-- &\circled{1}& -->
+<% cache('table_of_all_companies') do %>  <!-- &\circled{1}& -->
   <table>
 &\vdots&
   </table>
@@ -581,15 +615,19 @@ Completed 200 OK in {\color{red}17ms (Views: 16.2ms | ActiveRecord: 0.0ms)}
 }!
 \end{lstlisting}
 
-\item It is possible to use Active record model as the cache key:
+\item It is also possible combine two levels which is called ``Russian Doll Caching''
+
 \lstset{language=Ruby, style=eclipse}
 \begin{lstlisting}[escapechar=&]
 # app/views/companies/index.html.rb
+<h1>Listing companies</h1>
+
+<% cache('table_of_all_companies', skip_digest: true) do %>  <!-- &\circled{1}& -->
 &\vdots&
 <tbody>
   <% @companies.each do |company| %>
     <tr>
-      <% cache(company) do %> # &&
+      <% cache(company) do %> # &\circled{2} We use Active record model as the cache key&
         <td><%= company.name %></td>
         <td><%= company.employees.count %></td>
         <td><%= link_to 'Show', company %></td>
@@ -607,8 +645,265 @@ Completed 200 OK in {\color{red}17ms (Views: 16.2ms | ActiveRecord: 0.0ms)}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\end{document}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Fragment Caching Expiration}
+\begin{itemize}
+\item The \texttt{expire\_fragment} method removes a fragment from the cache. It takes a string, hash or regular expression (\alert{This syntax is not supported by memcache}).
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/models/company.rb
+ validates :name, presence: true, uniqueness: true
+  has_many :employees, dependent: :destroy
+
+  def to_s
+    name
+  end
+
+  private
+  after_create :expire_cache
+  def expire_cache
+    ActionController::Base.new.expire_fragment('table_of_all_companies')
+  end
+\end{lstlisting}
+
+\item Log the rails server after create a new company
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+&\outputcommand{\vdots\\
+Expire fragment (table\_of\_all\_companies) (21.5ms)
+\vdots
+Write fragment views/companies/70-20140405130708692365000/5be4b27c2ab4e08ad5fd8f56f7acc346 (2.3ms)\\
+Write fragment views/table\_of\_all\_companies (3.0ms)\\
+  Rendered companies/index.html.erb within layouts/application (496.0ms)\\
+Completed 200 OK in 526ms (Views: 520.4ms | ActiveRecord: 2.6ms)}&
+\end{lstlisting}
+
+\item \texttt{after\_create, after\_update, before\_destroy, after\_touch} ?
+\end{itemize}
+
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Cache Sweepers}
+\begin{itemize}
+\item Cache sweepers are much like observers and they define the cache sweeping behavior for a controller
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/models/company.rb
+# R E S E T - T H E - C L A S S
+class Company < ActiveRecord::Base
+  validates :name, presence: true, uniqueness: true
+  has_many :employees, dependent: :destroy
+
+  def to_s
+    name
+  end
+end
+\end{lstlisting}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/controllers/companies_controller.rb
+class CompaniesController < ApplicationController
+  before_action :set_company, only: [:show, :edit, :update, :destroy]
+
+  cache_sweeper :companies_sweeper, only: [:create] # &\circled{1}&
+&\vdots&
+end
+\end{lstlisting}
+\item Rails is looking for a \texttt{CompaniesSweeper} constant, which is supposed to define the cache sweeping behavior. To define
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/sweepers/companies_sweeper.rb
+class CompaniesSweeper < ActionController::Caching::Sweeper
+  observe Company
+  def after_create(company)
+    expire_fragment(%r{table_of_all_companies/.*})
+  end
+end
+\end{lstlisting}
+\item Rails bug? Work around \dots
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# Gemfile
+&\vdots&
+gem 'faker'
+gem 'rails-observers' # &\circled{1}&
+&\vdots&
+\end{lstlisting}
+\texttt{Bundle install}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# config/application.rb
+&\vdots&
+# require "rails/test_unit/railtie"
+require "rails/observers/activerecord/active_record" # &\circled{1}&
+&\vdots&
+\end{lstlisting}
+
+\item Check the application
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Memcache and Dalli}
+\begin{itemize}
+\item Dalli is a high performance pure Ruby client for accessing memcached servers
+\item It works with memcached 1.4+ only as it uses the newer binary protocol
+\item It should be considered a replacement for the memcache-client gem
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=&]
+$ sudo yum install memcached
+$ sudo /etc/init.d/memcached start
+\end{lstlisting}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# Gemfile
+&\vdots&
+gem 'dalli' # &\circled{1}&
+&\vdots&
+\end{lstlisting}
+\texttt{Bundle install}
+
+\item Configure Dalli in \texttt{config/environments/development.rb}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+config.cache_store = :dalli_store
+\end{lstlisting}
+
+\item Check the application
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{1+N Problem}
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Page Caching}
+\begin{itemize}
+\item The so-called 1+N problem is characteristic 
+\item Who work in Texas?
+\begin{itemize}
+\item Add a route (\texttt{match '/search', to: 'companies\#search', via: 'get'})
+\item Add an \texttt{search} action in \texttt{companies} controller
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# GET /companies/search?state=Texas
+  def search
+    @companies = Company.where(state: params[:state])
+  end
+\end{lstlisting}
+
+\item Edit a template file for this action \texttt{app/views/companies/search.html.erb}
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+<h1>Listing employees in </h1>
+
+<% @companies.each do |company| %>
+    <table>
+      <thead>
+      <tr>
+        <th>Last name</th>
+        <th>First name</th>
+        <th>Phone number</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% company.employees.each do |employee| %>
+          <tr>
+            <td><%= employee.last_name %></td>
+            <td><%= employee.first_name %></td>
+            <td><%= employee.phone_number %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+
+<br>
+\end{lstlisting}
+
+\item Visit the page \texttt{htpp://localhost:3000/search?state=Texas} and the ``N+1'' problem is presented
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+Started GET "/search?state=Texas" for 127.0.0.1 at 2014-04-06 21:31:42 +0100
+  ActiveRecord::SchemaMigration Load (0.6ms)  SELECT "schema_migrations".* FROM "schema_migrations"
+Processing by CompaniesController#search as HTML
+  Parameters: {"state"=>"Texas"}
+  Company Load (120.6ms)  SELECT "companies".* FROM "companies" WHERE (state = 'Texas')
+  Employee Load (22.3ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 53]]
+  Employee Load (0.6ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 82]]
+  Employee Load (1.2ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 88]]
+&\vdots&
+  Employee Load (0.5ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 2466]]
+  Employee Load (0.9ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 2485]]
+  Employee Load (0.8ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" = ?  [["company_id", 2549]]
+  Rendered companies/search.html.erb within layouts/application (881.4ms)
+Completed 200 OK in 1441ms (Views: 1154.4ms | !{\color{red}ActiveRecord: 199.8ms}!)
+\end{lstlisting}
+
+\end{itemize}
+
+\item First of all, a more Ruby version
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/model/company.rb
+class Company < ActiveRecord::Base
+  validates :name, presence: true, uniqueness: true
+  has_many :employees, dependent: :destroy
+
+  scope :workers_in, ->(state) {where("state = ?", state)} &\circled{1}&
+
+  def to_s
+    name
+  end
+end
+\end{lstlisting}
+
+\item Eager loading
+
+\lstset{language=Ruby, style=eclipse}
+\begin{lstlisting}[escapechar=&]
+# app/controllers/companies_controller.rb
+&\vdots&
+# GET /companies/search?query='Texas'
+  def search
+    scope :workers_in, ->(state) {includes(:employees).where("state = ?", state)} # &\circled{1}&
+  end
+&\vdots&
+\end{lstlisting}
+
+\lstset{language=shell}
+\begin{lstlisting}[escapechar=!]
+Started GET "/search?state=Texas" for 127.0.0.1 at 2014-04-06 21:38:45 +0100
+Processing by CompaniesController#search as HTML
+  Parameters: {"state"=>"Texas"}
+  Company Load (81.9ms)  SELECT "companies".* FROM "companies" WHERE (state = 'Texas')
+  Employee Load (24.0ms)  SELECT "employees".* FROM "employees" WHERE "employees"."company_id" IN (53, 82, 88, 227, 250, 256, 301, 335, 341, 353, 382, 477, 483, 549, 556, 601, 625, 664, 691, 695, 699, 857, 919, 1075, 1084, 1133, 1250, 1267, 1289, 1322, 1359, 1365, 1391, 1404, 1443, 1762, 1784, 1811, 1890, 2006, 2063, 2084, 2089, 2102, 2104, 2125, 2153, 2223, 2274, 2307, 2335, 2466, 2485, 2549)
+  Rendered companies/search.html.erb within layouts/application (411.2ms)
+Completed 200 OK in 506ms (Views: 396.3ms | !{\color{red}ActiveRecord: 105.9ms}!)
+\end{lstlisting}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{More Caching}
 \subsection{Page Caching}
 \begin{frame}[fragile]
 \frametitle{Page Caching}
@@ -623,32 +918,18 @@ will controller filters be triggered—absolutely nothing to do with Rails will 
 like the static HTML files in your project’s public directory
 \end{itemize}
 \end{frame}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Page Caching - Home Page}
 \begin{itemize}
-\item Run Rails server and  visit the \texttt{sample\_app home page} in order to get measures of ``views time'' and ``active record time''
+
+\item Page Caching has been removed from Rails 4 so we have to install a gem for that\dots
 \lstset{language=shell}
 \begin{lstlisting}[escapechar=!]
-$ curl http://localhost:3000
-!\outputcommand{Started GET "/" for 127.0.0.1 at 2014-04-02 12:43:15 +0100\\
-Processing by StaticPagesController\#home as */*\\
-\vdots
-  Rendered layouts/\_header.html.erb (1.8ms)\\
-  Rendered layouts/\_footer.html.erb (0.6ms)\\
-Completed 200 OK in 39ms (Views: 26.4ms | ActiveRecord: 0.5ms)\\
-}!
-\end{lstlisting}
-
-\item To add page caching to the home page it is necessary to modify the files \texttt{config/routes.rb} and \texttt{app/controllers/static\_pages\_controller.rb}. 
-
-\lstset{language=Ruby, style=eclipse}
-\begin{lstlisting}[escapechar=!]
-# config/routes.rb
-!\vdots!
-  match '/public',  to: 'static_pages#public', via: 'get'
-  match '/', to: 'static_pages#home', via: 'get'
-!\vdots!
+$ echo "gem 'actionpack-page_caching'" >> Gemfile
+$ bundle install
 \end{lstlisting}
 
 \lstset{language=Ruby, style=eclipse}
@@ -686,36 +967,43 @@ class StaticPagesController < ApplicationController
 end
 \end{lstlisting}
 
-\item Get new measures of ``views time'' and ``active record time''
-
-\lstset{language=shell}
-\begin{lstlisting}[escapechar=!]
-$ $ curl http://localhost:3000
-!\outputcommand{Started GET "/" for 127.0.0.1 at 2014-04-02 15:03:42 +0100\\
-\vdots
-Completed 302 Found in 19ms (ActiveRecord: 0.5ms)\\
-}!
-\end{lstlisting}
-
 \item The web server wrote the page in the location \texttt{public/static\_pages/public.html}
 
-\item Run the rspec test to check the color of the refactoring
 
-\lstset{language=shell}
-\begin{lstlisting}
-$ spec rspec/
-\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\subsection{Action caching}
+\begin{frame}[fragile]
+\frametitle{Action caching}
+\begin{itemize}
+\item Use \url{http://www.google.com/analytics}
+\end{itemize}
+\end{frame}
+
+
+\subsection{Preheating}
+\begin{frame}[fragile]
+\frametitle{Preheating}
+\begin{itemize}
+\item Use \url{http://www.google.com/analytics} for public pages
+\item Checkout the behaviour patterns of your users 
 \end{itemize}
 
-
 \end{frame}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Homeworks}
 \begin{frame}[fragile]
 \frametitle{Homeworks}
 \begin{itemize}
-\item 
+\item Finalizar el tutorial de rails en \url{http://ruby.railstutorial.org}
+\item Tabular los controladores (usuarios, sesiones, microposts), las acciones y las vistas de \texttt{sample\_app}. Para cada una de las entradas decidir cuándo es posible ``page caching'',
+``action caching'' or ``fragment chaching'' (con o sin ``russian doll'').  Decidir las condiciones de invalidación en su caso o ``expire time''
+\item Escribir un cron-job que precargue las páginas de algunos usuarios
+\item Para simplificar no tener en cuenta las llamadas AJAX
 \end{itemize}
 
 \end{frame}
